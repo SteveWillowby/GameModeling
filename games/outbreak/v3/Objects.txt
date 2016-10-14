@@ -1,42 +1,40 @@
 #Multi-Use
 
 Object Container
-  null
 
 Object ActiveRoomHolder
-  null
-
-Object Discards
-  null
 
 Object MissionSlots
-  null
 
-Object Trait
-  type: Friend/Block/Animal/Sight/Fix/Computer/Fight/Speed
-
-Object Phase
-  type: Move/UseTokens/Space/Select/Room
+Object FriendType
+Object BlockType
+Object AnimalType
+Object SightType
+Object FixType
+Object ComputerType
+Object FightType
+Object SpeedType
 
 Object Room
-  t0: Trait
-  t1: Trait
-  t2: Trait
 
 Object Asset
-  t0: Trait
-  t1: Trait
+
+Object MovePhase
+Object UseTokensPhase
+Object SpacePhase
+Object SelectPhase
+Object RoomPhase
+Object ResolvePhase
+Object GetAntidotesPhase
 
 Object Question
-  text: String
+  text: String //// How to enter this? ////
 
 #Track
 
 Object Marker
-  null
 
 Object Token
-  null
 
 Object TrackCell
   next: TrackCell

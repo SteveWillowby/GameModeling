@@ -1,85 +1,118 @@
+#GetAntidotes
+
+Action DrawAntidote GetAntidotesPhase p Container c ActiveRoomHolder a Room r
+  require: r.in a
+  require: r.has a'
+  effect: delete a'
+  effect: //// draw antidote from container ////
+
+Action FinishDrawing GetAntidotesPhase p ActiveRoomHolder a Room r
+  require: r.in a
+  require: not r.has a' //// What's a better way to say has nothing? ////
+  effect: delete r
+  effect: delete p
+  effect: create MovePhase
+
+#Resolve
+
+Action Succeed ResolvePhase p ActiveRoomHolder a Room r MissionSlots m
+  require: r.in a
+  require: m.rhas r.has //// a recursive has ////
+  effect: take p ResolvePhase 1
+  effect: give p GetAntidotesPhase 1
+
+Action Fail ResolvePhase p ActiveRoomHolder a Room r MissionSlots m
+  require: r.in a
+  require: not m.rhas r.has //// a recursive has ////
+  effect: delete r
+  effect: //// delete all assets in a ////
+  effect: delete p
+  effect: create MovePhase
+
+
 #SelectRoom
 
-Action SelectRoom Phase p Container c ActiveRoomHolder a
-  require: p.type Select
+Action SelectRoom SelectPhase p Container c ActiveRoomHolder a
   require: not a.has Room
   effect: takeput c a Room 1 rand
+  effect: delete p
+  effect: create RoomPhase
 
-Action RejectRoom Phase p Container c ActiveRoomHolder a Discards d
-  require: p.type Select
-  require: a.has Room
-  effect: takeput a d Room 1
+Action RejectRoom SelectPhase p Container c ActiveRoomHolder a Room r
+  require: r.in a
+  effect: delete r
   effect: takeput c a Room 1 rand
 
-Action SelectRoom Phase p ActiveRoomHolder a
-  require: p.type Select
+Action SelectRoom SelectPhase p ActiveRoomHolder a
   require: a.has Room
-  effect: p.type Room
+  effect: delete p
+  effect: create RoomPhase
 
 
 #Room
 
-Action AskQuestion Phase p Container c Question q
-  require: p.type Room
+//// somehow add time limit ////
+
+Action AskQuestion RoomPhase p Container c Question q
   require: //// player has q ////
   effect: q.in c
 
-Action SendAsset Phase p MissionSlots m Asset a
-  require: p.type Room
+Action SendAsset RoomPhase p MissionSlots m Asset a
   require: //// Player has a ////
   require: //// m has less than three elements ////  
   effect: a.in m //// is this good enough? ////
 
-Action RecallAsset Phase p MissionSlots m Asset a
-  require: p.type Room
+Action RecallAsset RoomPhase p MissionSlots m Asset a
   require: a.in m
   effect: //// return a to player ////
+
+Action LockInAssets RoomPhase p
+  effect: delete p
+  effect: create ResolvePhase
 
 
 #Space
 
-Action DrawAsset Container c Marker m Phase p
-  require: p.type Space
+Action DrawAsset Container c Marker m SpacePhase p
   require: c.has Asset
   require: m.in.type Green
   effect: //// Transfer rand from container to player ////
-  effect: p.type Move
+  effect: delete p
+  effect: create MovePhase
 
-Action LoseAsset Marker m Phase p Asset a Discards d
-  require: p.type Space
+Action LoseAsset Marker m SpacePhase p Asset a //// REPLACE THIS ASSET WITH CARD ////
   require: m.in.type Red
-  effect: a.in d
-  effect: p.type Move
+  effect: delete a
+  effect: delete p
+  effect: create MovePhase
 
-Action EnterRoom Marker m Phase p
-  require: p.type Space
+Action EnterRoom Marker m SpacePhase p
   require: m.in.type Room
   effect: //// Hand out question tokens? ////
-  effect: p.type Room
+  effect: delete p
+  effect: create SelectPhase
 
 
 #Track
 
-Action SpendToken Marker m Container c Phase p
-  require: p.type UseTokens
+Action SpendToken Marker m Container c UseTokensPhase p
   require: m.in.next not null #Can this sort of check be automated?
   require: c.has Token
   effect: m.in m.in.next
   effect: remove Token c 1 #How to best format this?
 
-Action Transition Container c Phase p
-  require: p.type UseTokens
+Action Transition Container c UseTokensPhase p
   require: not c.has Token
-  effect: p.type Space
+  effect: delete p
+  effect: create SpacePhase
 
-Action StopAtRoom Container c Marker m Phase p
-  require: p.type UseTokens
+Action StopAtRoom Container c Marker m UseTokensPhase p
   require: m.in.type Room
   effect: remove Token c all
 
-Action Move Track t Container c Phase p
-  require: p.type Move
+Action Move Track t Container MovePhase p
   require: m.in.next not null
   effect: m.in m.in.next
   effect: put Token c Rand(0,5)
-  effect: p.type UseTokens
+  effect: delete p
+  effect: create UseTokensPhase
