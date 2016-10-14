@@ -1,0 +1,14 @@
+Object Asset
+  type: i
+  type: A/B/C/D/E/F/G/H
+
+
+Object Tool
+  Assets: Asset Array
+
+
+Object ToolDeck
+  Null
+
+
+Object Cure

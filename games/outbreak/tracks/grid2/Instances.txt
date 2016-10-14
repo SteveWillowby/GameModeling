@@ -1,0 +1,36 @@
+Track t
+  g1:
+    w: 8
+    h: 1
+  g2:
+    w: 1
+    h: 8
+  g3:
+    w: 8
+    h: 1
+  g4:
+    w: 1
+    h: 5
+
+CellType Green
+  type: Green
+  in: [
+    t.g1[0][0],
+    t.g1[1][0],
+    t.g1[2][0]
+      ]
+
+CellType Red
+  type: Red
+  in: [
+    t.g1[3][0]
+      ]
+
+CellType Room
+  type: Room
+  in: [
+    t.g1[4][0]
+      ]
+
+Pawn p
+  p.in t.g1[0][0]

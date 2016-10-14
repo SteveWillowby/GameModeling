@@ -1,0 +1,31 @@
+TrackCell t0
+  next: t1
+  type: Green
+
+TrackCell t1
+  next: t2
+  type: Green
+
+TrackCell t2
+  next: t3
+  type: Green
+
+TrackCell t3
+  next: t4
+  type: Red
+
+TrackCell t4
+  next: null
+  type: Room
+
+Marker m
+
+Containter c
+
+Track t
+  start: t0
+  marker: m
+  tokens: c
+
+Marker m
+  in: t.start //Could have in: t0

@@ -1,0 +1,16 @@
+Object Marker
+  null
+
+Object Token
+  null
+
+Object Container
+  null
+
+Object TrackCell
+  next: TrackCell
+  type: Red/Green/Room
+
+Object Track
+  start: TrackCell
+  marker: Marker

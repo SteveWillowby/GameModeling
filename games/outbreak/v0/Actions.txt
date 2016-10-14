@@ -1,0 +1,46 @@
+Action Roll
+  Player: Active
+  ActionContext: Roll
+  NextActionContext: Move
+  Require: Null
+  Effect: Give Rand(0,5) MoveToken Game
+  Effect: Pawn.in Pawn.in.next
+
+Action Move
+  Must
+  Player: Game
+  ActionContext: Move
+  NextActionContext: Move
+  Require: Pawn.in -Room
+  Require: Owns MoveToken
+  Effect: Pawn.in Pawn.in.next
+  Effect: Take 1 MoveToken Game //include Game? -- could also be Player
+
+Action Stop
+  Must
+  Player: Game
+  ActionContext: Move
+  NextActionContext: Space
+  Require: -Owns MoveToken | Pawn.in Room
+  Effect: Take All MoveToken Game
+
+Action DrawTool
+  Must
+  Player: Active
+  ActionContext: Space
+  NextActionContext: Roll
+  Require: Pawn.in.type Green
+  Effect: TakeGive 1-Rand Tool ToolDeck Player
+
+Action DiscardTool
+  Must
+  Player: Active
+  ActionContext: Space
+  NextActionContext: Roll
+  Require: Pawn.in Red
+  Effect: Take 1 Tool Player
+
+Action EnterRoom
+  Must
+  Player: Active
+

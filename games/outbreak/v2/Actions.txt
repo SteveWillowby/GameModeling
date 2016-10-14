@@ -1,0 +1,17 @@
+Action Move
+  Player: Active //Correct?
+  Outrk.move
+
+MustAction DrawTool
+  Player: Active
+  Require: Pawn.in.type Green
+  Effect: TakeGive 1-Rand Tool ToolDeck Player
+
+MustAction DiscardTool
+  Player: Active
+  Require: Pawn.in.type Red
+  Effect: Take 1 Tool Player
+
+MustAction EnterRoom
+  Player: Active
+

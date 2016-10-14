@@ -1,0 +1,85 @@
+#SelectRoom
+
+Action SelectRoom Phase p Container c ActiveRoomHolder a
+  require: p.type Select
+  require: not a.has Room
+  effect: takeput c a Room 1 rand
+
+Action RejectRoom Phase p Container c ActiveRoomHolder a Discards d
+  require: p.type Select
+  require: a.has Room
+  effect: takeput a d Room 1
+  effect: takeput c a Room 1 rand
+
+Action SelectRoom Phase p ActiveRoomHolder a
+  require: p.type Select
+  require: a.has Room
+  effect: p.type Room
+
+
+#Room
+
+Action AskQuestion Phase p Container c Question q
+  require: p.type Room
+  require: //// player has q ////
+  effect: q.in c
+
+Action SendAsset Phase p MissionSlots m Asset a
+  require: p.type Room
+  require: //// Player has a ////
+  require: //// m has less than three elements ////  
+  effect: a.in m //// is this good enough? ////
+
+Action RecallAsset Phase p MissionSlots m Asset a
+  require: p.type Room
+  require: a.in m
+  effect: //// return a to player ////
+
+
+#Space
+
+Action DrawAsset Container c Marker m Phase p
+  require: p.type Space
+  require: c.has Asset
+  require: m.in.type Green
+  effect: //// Transfer rand from container to player ////
+  effect: p.type Move
+
+Action LoseAsset Marker m Phase p Asset a Discards d
+  require: p.type Space
+  require: m.in.type Red
+  effect: a.in d
+  effect: p.type Move
+
+Action EnterRoom Marker m Phase p
+  require: p.type Space
+  require: m.in.type Room
+  effect: //// Hand out question tokens? ////
+  effect: p.type Room
+
+
+#Track
+
+Action SpendToken Marker m Container c Phase p
+  require: p.type UseTokens
+  require: m.in.next not null #Can this sort of check be automated?
+  require: c.has Token
+  effect: m.in m.in.next
+  effect: remove Token c 1 #How to best format this?
+
+Action Transition Container c Phase p
+  require: p.type UseTokens
+  require: not c.has Token
+  effect: p.type Space
+
+Action StopAtRoom Container c Marker m Phase p
+  require: p.type UseTokens
+  require: m.in.type Room
+  effect: remove Token c all
+
+Action Move Track t Container c Phase p
+  require: p.type Move
+  require: m.in.next not null
+  effect: m.in m.in.next
+  effect: put Token c Rand(0,5)
+  effect: p.type UseTokens

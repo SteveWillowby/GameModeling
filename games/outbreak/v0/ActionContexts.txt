@@ -1,0 +1,6 @@
+ActionContexts:
+  Roll
+  Move
+  Space
+  Room 120 Results //Time limit of 120 secs on Room; move to Results if time is up
+  GetCures

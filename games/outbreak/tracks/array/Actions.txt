@@ -1,0 +1,3 @@
+Action Move Track t
+  Require t.pawn.in not t.spaces.last
+  Effect t.pawn.in t.spaces[t.pawn.in.idx + 1]

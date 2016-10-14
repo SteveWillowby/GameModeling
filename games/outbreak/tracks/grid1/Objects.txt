@@ -1,0 +1,11 @@
+Object Track
+  path1: Grid
+  path2: Grid
+  path3: Grid
+  path4: Grid
+
+Object Pawn
+  null
+
+Object CellType
+  type: Green/Red/Room

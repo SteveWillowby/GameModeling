@@ -1,0 +1,9 @@
+Track t
+  spaces: [
+    type: Green,
+    type: Green,
+    type: Green,
+    type: Red,
+    type: Room
+    ]
+

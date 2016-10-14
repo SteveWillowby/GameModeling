@@ -1,0 +1,8 @@
+Object Track
+  start: TrackCell
+  markers: _ Array
+  move: Action //Too general?
+
+Object TrackCell
+  next: Track
+  type: Red/Green/Room

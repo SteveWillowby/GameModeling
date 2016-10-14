@@ -1,0 +1,16 @@
+Action Move1
+  Require: Track t
+  Require: Pawn p
+  Require: p.in t.g1 //Note the p is really in a cell of t.g1
+  Require: not p.in leftmost t.g1
+  Effect: move p left 1
+
+Action Move12
+  Require: Track t
+  Require: Pawn p
+  Require: p.in leftmost t.g1
+  Effect: p.in bottom t.g2
+
+.
+.
+.

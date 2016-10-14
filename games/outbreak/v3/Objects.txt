@@ -1,0 +1,47 @@
+#Multi-Use
+
+Object Container
+  null
+
+Object ActiveRoomHolder
+  null
+
+Object Discards
+  null
+
+Object MissionSlots
+  null
+
+Object Trait
+  type: Friend/Block/Animal/Sight/Fix/Computer/Fight/Speed
+
+Object Phase
+  type: Move/UseTokens/Space/Select/Room
+
+Object Room
+  t0: Trait
+  t1: Trait
+  t2: Trait
+
+Object Asset
+  t0: Trait
+  t1: Trait
+
+Object Question
+  text: String
+
+#Track
+
+Object Marker
+  null
+
+Object Token
+  null
+
+Object TrackCell
+  next: TrackCell
+  type: Red/Green/Room
+
+Object Track
+  start: TrackCell
+  marker: Marker

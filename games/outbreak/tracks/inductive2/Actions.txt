@@ -1,0 +1,20 @@
+NonAction Step Marker m
+  require: m.in.next not null //Can this sort of check be automated - just m.in notnull
+  effect: m.in m.in.next
+
+MustAction SpendToken Container c
+  Step
+  require: c.has Token
+  effect: remove Token c 1 //How to best format this?
+
+MustAction ClearTokens Container c Marker m
+  require: -Step
+  effect: remove Token c all
+
+MustAction ClearTokens2 Container c Marker m
+  require: m.in.type Room
+  effect: ClearTokens
+
+NonAction Move Track t Container c
+  Step
+  effect: put Rand(0,5) Token c

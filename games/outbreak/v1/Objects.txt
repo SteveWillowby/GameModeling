@@ -1,0 +1,27 @@
+Object Asset
+  type: i
+  type: A/B/C/D/E/F/G/H
+
+
+Object Tool
+  Assets: Asset Array
+
+
+Object ToolDeck
+  Null
+
+
+Object Pawn
+  Null
+
+
+Object Track
+  next: Track
+  type: Green/Red/Room
+
+
+Object Cure
+
+
+Object MoveToken
+  Null

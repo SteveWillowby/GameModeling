@@ -1,0 +1,9 @@
+Object Space
+  type: Red/Green/Room
+
+Object Marker
+  null
+
+Object Track
+  spaces: Space Array
+  pawn: Marker

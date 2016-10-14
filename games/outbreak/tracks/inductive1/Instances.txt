@@ -1,0 +1,29 @@
+Track
+  start: t0
+  markers: [
+      0: _
+    ]
+  move:
+    require: markers[0].in.next not null 
+    effect: markers[0].in markers[0].in.next
+
+TrackCell t0
+  next: t1
+  type: Green
+
+TrackCell t1
+  next: t2
+  type: Green
+
+TrackCell t2
+  next: t3
+  type: Green
+
+TrackCell t3
+  next: t4
+  type: Red
+
+TrackCell t4
+  next: null
+  type: Room
+

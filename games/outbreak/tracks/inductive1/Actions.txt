@@ -1,0 +1,3 @@
+Track::move //Is it come to this? Object oriented programming?
+  require: markers[0].in.next not null 
+  effect: markers[0].in markers[0].in.next
