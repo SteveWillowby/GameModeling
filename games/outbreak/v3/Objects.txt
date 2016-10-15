@@ -26,6 +26,7 @@ Object SelectPhase
 Object RoomPhase
 Object ResolvePhase
 Object GetAntidotesPhase
+Object RefillAssetsPhase
 
 Object Question
   text: String //// should this be a visualization thing? ////

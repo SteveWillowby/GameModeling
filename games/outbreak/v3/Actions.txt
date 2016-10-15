@@ -1,33 +1,46 @@
+#RefillAssets
+
+Action RefillAssets RefillAssetsPhase p Container c
+  require: player.owns Asset < 3
+  effect: distribute c player Asset 1 rand
+
+Action EndRefill RefillAssetsPhase p
+  effect: Players Former.Left
+  effect: delete p
+  effect: create MovePhase
+
 #GetAntidotes
 
 Action DrawAntidote GetAntidotesPhase p Container c ActiveRoomHolder a Room r
   require: r.in a
-  require: r.has a'
+  require: r.has Object a'      #Here Object indicates "any type"
   effect: delete a'
   effect: //// draw antidote from container ////
 
 Action FinishDrawing GetAntidotesPhase p ActiveRoomHolder a Room r
   require: r.in a
-  require: not r.has a' //// What's a better way to say has nothing? ////
+  require: r.has Object = 0          #Room has zero objects in it
   effect: delete r
   effect: delete p
   effect: create MovePhase
+  effect: Players Former.Left
+
 
 #Resolve
 
 Action Succeed ResolvePhase p ActiveRoomHolder a Room r MissionSlots m
   require: r.in a
-  require: m.rhas r.has //// a recursive has ////
+  require: m.rhas r.has         #a recursive has
   effect: take p ResolvePhase 1
   effect: give p GetAntidotesPhase 1
 
 Action Fail ResolvePhase p ActiveRoomHolder a Room r MissionSlots m
   require: r.in a
-  require: not m.rhas r.has //// a recursive has ////
+  require: not m.rhas r.has     #a recursive has
   effect: delete r
-  effect: //// delete all assets in a ////
+  effect: delete a.has     #Delete all assets in a
   effect: delete p
-  effect: create MovePhase
+  effect: create RefillAssetsPhase
 
 
 #SelectRoom
@@ -47,6 +60,7 @@ Action SelectRoom SelectPhase p ActiveRoomHolder a
   require: a.has Room
   effect: delete p
   effect: create RoomPhase
+  effect: Players All
 
 
 #Room
@@ -54,17 +68,18 @@ Action SelectRoom SelectPhase p ActiveRoomHolder a
 //// somehow add time limit ////
 
 Action AskQuestion RoomPhase p Container c Question q
-  require: //// player has q ////
+  require: player.owns q
   effect: q.in c
+  effect: disown q
 
 Action SendAsset RoomPhase p MissionSlots m Asset a
-  require: //// Player has a ////
-  require: //// m has less than three elements ////  
-  effect: a.in m //// is this good enough? ////
+  require: player.owns a
+  require: m.has Asset < 3      #m has fewer than three Assets
+  effect: a.in m
 
 Action RecallAsset RoomPhase p MissionSlots m Asset a
   require: a.in m
-  effect: //// return a to player ////
+  effect: a.in null
 
 Action LockInAssets RoomPhase p
   effect: delete p
@@ -76,19 +91,22 @@ Action LockInAssets RoomPhase p
 Action DrawAsset Container c Marker m SpacePhase p
   require: c.has Asset
   require: m.in.has GreenCell
-  effect: //// Transfer rand from container to player ////
+  effect: distribute c player Asset 1 rand
   effect: delete p
   effect: create MovePhase
+  effect: Players Current.Left
 
 Action LoseAsset Marker m SpacePhase p Asset a
   require: m.in.has RedCell
   effect: delete a
   effect: delete p
   effect: create MovePhase
+  effect: Players Current.Left
 
-Action EnterRoom Marker m SpacePhase p
+Action EnterRoom Marker m SpacePhase p Container c
   require: m.in.has RoomCell
-  effect: //// Hand out question tokens? ////
+  require: c.has Question 12
+  effect: distribute c All Question 12 rand
   effect: delete p
   effect: create SelectPhase
 
