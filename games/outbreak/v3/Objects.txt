@@ -28,7 +28,8 @@ Object ResolvePhase
 Object GetAntidotesPhase
 
 Object Question
-  text: String //// How to enter this? ////
+  text: String //// should this be a visualization thing? ////
+
 
 #Track
 
@@ -36,10 +37,7 @@ Object Marker
 
 Object Token
 
+Object RedCell
+Object GreenCell
+Object RoomCell
 Object TrackCell
-  next: TrackCell
-  type: Red/Green/Room
-
-Object Track
-  start: TrackCell
-  marker: Marker

@@ -75,19 +75,19 @@ Action LockInAssets RoomPhase p
 
 Action DrawAsset Container c Marker m SpacePhase p
   require: c.has Asset
-  require: m.in.type Green
+  require: m.in.has GreenCell
   effect: //// Transfer rand from container to player ////
   effect: delete p
   effect: create MovePhase
 
-Action LoseAsset Marker m SpacePhase p Asset a //// REPLACE THIS ASSET WITH CARD ////
-  require: m.in.type Red
+Action LoseAsset Marker m SpacePhase p Asset a
+  require: m.in.has RedCell
   effect: delete a
   effect: delete p
   effect: create MovePhase
 
 Action EnterRoom Marker m SpacePhase p
-  require: m.in.type Room
+  require: m.in.has RoomCell
   effect: //// Hand out question tokens? ////
   effect: delete p
   effect: create SelectPhase
@@ -96,9 +96,9 @@ Action EnterRoom Marker m SpacePhase p
 #Track
 
 Action SpendToken Marker m Container c UseTokensPhase p
-  require: m.in.next not null #Can this sort of check be automated?
+  require: m.in.in not null #Can this sort of check be automated?
   require: c.has Token
-  effect: m.in m.in.next
+  effect: m.in m.in.in
   effect: remove Token c 1 #How to best format this?
 
 Action Transition Container c UseTokensPhase p
@@ -111,8 +111,8 @@ Action StopAtRoom Container c Marker m UseTokensPhase p
   effect: remove Token c all
 
 Action Move Track t Container MovePhase p
-  require: m.in.next not null
-  effect: m.in m.in.next
+  require: m.in.in not null
+  effect: m.in m.in.in
   effect: put Token c Rand(0,5)
   effect: delete p
   effect: create UseTokensPhase

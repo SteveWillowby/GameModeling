@@ -1,31 +1,25 @@
+GreenCell c0
+GreenCell c1
+GreenCell c2
+RedCell c3
+RoomCell c4
+
 TrackCell t0
-  next: t1
-  type: Green
-
+  has: c0
 TrackCell t1
-  next: t2
-  type: Green
-
+  has: t0
+  has: c1
 TrackCell t2
-  next: t3
-  type: Green
-
+  has: t1
+  has: c2
 TrackCell t3
-  next: t4
-  type: Red
-
+  has: t2
+  has: c3
 TrackCell t4
-  next: null
-  type: Room
+  has: t3
+  has: c4
 
 Marker m
+  in: t0
 
 Containter c
-
-Track t
-  start: t0
-  marker: m
-  tokens: c
-
-Marker m
-  in: t.start //Could have in: t0
