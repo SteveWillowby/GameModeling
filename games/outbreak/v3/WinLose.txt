@@ -1,0 +1,11 @@
+WinCondition Container c      #Conditions have no names
+  c.has Antidote > 8
+
+#Lose if you're in the last space during the move phase
+LoseCondition Container c Marker m MovePhase p
+  c.has Antidote < 9
+  m.in.in null
+
+#Alternatively, lose if you run out of assets
+LoseCondition Container c
+  c.has Asset 0

@@ -1,5 +1,7 @@
 #Multi-Use
 
+Object Antidote
+
 Object Container
 
 Object ActiveRoomHolder
@@ -23,13 +25,14 @@ Object MovePhase
 Object UseTokensPhase
 Object SpacePhase
 Object SelectPhase
+Object StartTimerPhase
+Object QuestionPhase
 Object RoomPhase
 Object ResolvePhase
 Object GetAntidotesPhase
 Object RefillAssetsPhase
 
 Object Question
-  text: String //// should this be a visualization thing? ////
 
 
 #Track
