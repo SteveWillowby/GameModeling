@@ -45,8 +45,8 @@ Action LoseAsset Marker m SpacePhase p Asset a
 
 Action EnterRoom Marker m SpacePhase p Container c
   require: m.in.has RoomCell
-  require: c.has Question 12
-  effect: distribute c All Question 12 rand
+  require: c.has Question 15
+  effect: distribute c All Question 15 rand
   effect: delete p
   effect: create SelectPhase
 

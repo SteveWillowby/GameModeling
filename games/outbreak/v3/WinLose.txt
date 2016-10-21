@@ -6,6 +6,9 @@ LoseCondition Container c Marker m MovePhase p
   c.has Antidote < 9
   m.in.in null
 
-#Alternatively, lose if you run out of assets
-LoseCondition Container c
+#Alternatively, lose if you run out of assets or rooms
+LoseCondition Container c MovePhase p
   c.has Asset 0
+
+LoseCondition Container c MovePhase p
+  c.has Room 0

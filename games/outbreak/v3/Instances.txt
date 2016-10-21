@@ -1,25 +1,41 @@
-GreenCell c0
-GreenCell c1
-GreenCell c2
-RedCell c3
-RoomCell c4
+MovePhase
 
 TrackCell t0
-  has: c0
+  has: GreenCell
 TrackCell t1
   has: t0
-  has: c1
+  has: GreenCell
 TrackCell t2
   has: t1
-  has: c2
+  has: GreenCell
 TrackCell t3
   has: t2
-  has: c3
+  has: RedCell
 TrackCell t4
   has: t3
-  has: c4
+  has: RoomCell
 
 Marker m
   in: t0
 
 Containter c
+
+
+######## All Assets ########
+
+Asset
+  in: c
+  has: FriendType
+  has: SpeedType
+
+Asset
+  in: c
+  has: SightType
+
+
+######## All Rooms ########
+
+Room
+  in: c
+  has: SightType
+  has: SpeedType
