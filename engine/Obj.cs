@@ -44,7 +44,7 @@ public class Obj : IObj
         }
         return l;
     }
-    
+
     protected LinkedListNode<Obj> NodeContains(IObj o)
     {
         LinkedList<Obj> l = ListContains(o.GetType());
@@ -65,10 +65,16 @@ public class Obj : IObj
     }
 
     //PutIn and TakeIn are mutually recursive -- very un-optimized
+    //!!! If the other IObj is not of type Obj, this might not work !!!
     void IObj.PutIn(IObj o)
     {
         if(!((IObj) this).In(o))
         {
+            if(_in != null) //First remove this from what it's in
+            {
+                ((IObj) this).RemoveFrom(_in);
+            }
+
             _in = (Obj) o;
             o.TakeIn(this);
         }
@@ -82,6 +88,7 @@ public class Obj : IObj
             if(!(l != null))
             {
                 l = new LinkedList<Obj>();
+                _contains.Add(o.GetType(), l);
             }
             l.AddFirst((Obj) o);
             o.PutIn(this);

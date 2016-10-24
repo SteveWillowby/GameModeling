@@ -1,0 +1,2 @@
+make objtest
+./testing/ObjTest.exe
