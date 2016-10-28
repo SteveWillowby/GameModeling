@@ -4,8 +4,8 @@ public class MainClass
 {
     static public void Main()
     {
-        IObj o = new Obj("pizza");
+        Object o = new Object("pizza");
         Console.WriteLine ("Pizza for lunch. Pizza for dinner.");
-        Console.WriteLine (o.GetType());
+        Console.WriteLine (o.type);
     }
 }

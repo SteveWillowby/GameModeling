@@ -29,6 +29,28 @@ public class Obj : IObj
         return NodeContains(o) != null;
     }
 
+    bool IObj.RIn(IObj o)
+    {
+        //wat
+    }
+
+    bool RInHelper(Obj goal, IObj init)
+    {
+        if(Object.ReferenceEquals(this, goal))
+        {
+            return true;
+        }
+        if(!(goal != null))
+        {
+            return false;
+        }
+        if(Object.ReferenceEquals(this, init))
+        {
+            return false;
+        }
+        return this._in.RInHelper(goal, init);
+    }
+
     bool IObj.ContainsType(string t)
     {
         LinkedList<Obj> l = ListContains(t);

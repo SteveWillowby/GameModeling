@@ -2,9 +2,16 @@ using System;
 
 public class MainClass
 {
+    public static TestRunner t = new TestRunner();
+
+    public static void InCheck(IObj a, IObj b, bool yes)
+    {
+        t.Compare(yes, a.In(b));
+        t.Compare(yes, b.Contains(a));
+    }
+
     static public void Main()
     {
-        TestRunner t = new TestRunner();
         IObj a1 = new Obj("a");
         IObj a2 = new Obj("a");
         IObj a3 = new Obj("a");
@@ -17,38 +24,36 @@ public class MainClass
         a1.PutIn(a2);
         b2.TakeIn(b1);
 
-        t.Compare(true, a1.In(a2));
-        t.Compare(false, a2.In(a1));
-        t.Compare(true, a2.Contains(a1));
-        t.Compare(false, a1.Contains(a2));
-        t.Compare(true, b1.In(b2));
-        t.Compare(false, b2.In(b1));
-        t.Compare(true, b2.Contains(b1));
-        t.Compare(false, b1.Contains(b2));
+        InCheck(a1, a2, true);
+        InCheck(a2, a1, false);
+        InCheck(b1, b2, true);
+        InCheck(b2, b1, false);
 
         a1.PutIn(a3);
 
-        t.Compare(true, a1.In(a3));
-        t.Compare(true, a3.Contains(a1));
-        t.Compare(false, a1.In(a2));
-        t.Compare(false, a2.Contains(a1));
+        InCheck(a1, a3, true);
+        InCheck(a1, a2, false);
 
         a2.PutIn(a3);
 
-        t.Compare(true, a1.In(a3));
-        t.Compare(true, a3.Contains(a1));
-        t.Compare(true, a2.In(a3));
-        t.Compare(true, a3.Contains(a2));
-        t.Compare(false, a1.In(a2));
-        t.Compare(false, a2.In(a1));
+        InCheck(a1, a3, true);
+        InCheck(a2, a3, true);
+        InCheck(a1, a2, false);
+        InCheck(a2, a1, false);
 
         a3.ThrowOut(a1);
 
-        t.Compare(false, a1.In(a3));
-        t.Compare(false, a3.Contains(a1));
-        t.Compare(true, a2.In(a3));
-        t.Compare(true, a3.Contains(a2));
-        t.Compare(false, a1.In(a2));
-        t.Compare(false, a2.In(a1));
+        InCheck(a1, a3, false);
+        InCheck(a2, a3, true);
+        InCheck(a1, a2, false);
+        InCheck(a2, a1, false);
+
+        a1.TakeIn(a3);
+
+        InCheck(a3, a1, true);
+        InCheck(a1, a3, false);
+        InCheck(a2, a3, true);
+        InCheck(a1, a2, false);
+        InCheck(a2, a1, false);
     }
 }
