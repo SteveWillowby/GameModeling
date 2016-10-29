@@ -1,8 +1,8 @@
 #Move
 
 Action Move Track t Container c MovePhase p
-  require: m.in.in not null
-  effect: m.in m.in.in
+  require: not in m.in null
+  effect: put m.in m
   effect: put c Token Rand(0,5)
   effect: delete p
   effect: create UseTokensPhase
@@ -11,41 +11,41 @@ Action Move Track t Container c MovePhase p
 #UseTokens
 
 Action SpendToken Marker m Container c UseTokensPhase p
-  require: m.in.in not null #Can this sort of check be automated?
-  require: c.has Token
-  effect: m.in m.in.in
+  require: not in m.in null #Can this sort of check be automated?
+  require: has c Token
+  effect: put m.in m
   effect: remove Token c 1 #How to best format this?
 
 Action Transition Container c UseTokensPhase p
-  require: not c.has Token
+  require: not has c Token
   effect: delete p
   effect: create SpacePhase
 
 Action StopAtRoom Container c Marker m UseTokensPhase p
-  require: m.in.type Room
+  require: in m Room
   effect: remove Token c all
 
 
 #Space
 
 Action DrawAsset Container c Marker m SpacePhase p
-  require: c.has Asset
-  require: m.in.has GreenCell
+  require: has c Asset
+  require: has m.in GreenCell
   effect: distribute c player Asset 1 rand
   effect: delete p
   effect: create MovePhase
   effect: Players Current.Left
 
 Action LoseAsset Marker m SpacePhase p Asset a
-  require: m.in.has RedCell
+  require: has m.in RedCell
   effect: delete a
   effect: delete p
   effect: create MovePhase
   effect: Players Current.Left
 
 Action EnterRoom Marker m SpacePhase p Container c
-  require: m.in.has RoomCell
-  require: c.has Question 15
+  require: has m.in RoomCell
+  require: has c Question 15
   effect: distribute c All Question 15 rand
   effect: delete p
   effect: create SelectPhase
@@ -54,18 +54,18 @@ Action EnterRoom Marker m SpacePhase p Container c
 #SelectRoom
 
 Action SelectRoom SelectPhase p Container c ActiveRoomHolder a
-  require: not a.has Room
+  require: not has a Room
   effect: takeput c a Room 1 rand
   effect: delete p
   effect: create RoomPhase
 
 Action RejectRoom SelectPhase p Container c ActiveRoomHolder a Room r
-  require: r.in a
+  require: in r a
   effect: delete r
   effect: takeput c a Room 1 rand
 
 Action SelectRoom SelectPhase p ActiveRoomHolder a
-  require: a.has Room
+  require: has a Room
   effect: delete p
   effect: create RoomPhase
   effect: Players All
@@ -74,7 +74,7 @@ Action SelectRoom SelectPhase p ActiveRoomHolder a
 #StartTimer
 
 Action StartTimer StartTimerPhase p
-  set timer 120         #set timer for 2 minutes
+  effect: set timer 120         #set timer for 2 minutes
   effect: delete p
   effect: create QuestionPhase
 
@@ -83,8 +83,8 @@ Action StartTimer StartTimerPhase p
 
 Action AskQuestion QuestionPhase p Container c Question q
   require: timer > 0
-  require: player.owns q
-  effect: q.in c
+  require: owns player q
+  effect: put c q
   effect: disown q
 
 Action FinishQuestioning QuestionPhase p
@@ -96,13 +96,13 @@ Action FinishQuestioning QuestionPhase p
 #Room
 
 Action SendAsset RoomPhase p MissionSlots m Asset a
-  require: player.owns a
-  require: m.has Asset < 3      #m has fewer than three Assets
-  effect: a.in m
+  require: owns player a
+  require: has m Asset < 3      #m has fewer than three Assets
+  effect: put m a
 
 Action RecallAsset RoomPhase p MissionSlots m Asset a
-  require: a.in m
-  effect: a.in null
+  require: in a m
+  effect: take m a
 
 Action LockInAssets RoomPhase p
   effect: delete p
@@ -112,14 +112,14 @@ Action LockInAssets RoomPhase p
 #Resolve
 
 Action Succeed ResolvePhase p ActiveRoomHolder a Room r MissionSlots m
-  require: r.in a
-  require: m.rhas r.has         #a recursive has
-  effect: take p ResolvePhase 1
-  effect: give p GetAntidotesPhase 1
+  require: in r a
+  require: rhas m r.has         #a recursive has
+  effect: delete p
+  effect: create GetAntidotesPhase
 
 Action Fail ResolvePhase p ActiveRoomHolder a Room r MissionSlots m
-  require: r.in a
-  require: not m.rhas r.has     #a recursive has
+  require: in r a
+  require: not rhas m r.has     #a recursive has
   effect: delete r
   effect: delete a.has     #Delete all assets in a
   effect: delete p
@@ -129,14 +129,14 @@ Action Fail ResolvePhase p ActiveRoomHolder a Room r MissionSlots m
 #GetAntidotes
 
 Action DrawAntidote GetAntidotesPhase p Container c ActiveRoomHolder a Room r
-  require: r.in a
-  require: r.has Object a'      #Here Object indicates "any type"
+  require: in r a
+  require: has r Object a'      #Here Object indicates "any type"
   effect: delete a'
   effect: put c Antidote Rand(0, 1)
 
 Action FinishDrawing GetAntidotesPhase p ActiveRoomHolder a Room r
-  require: r.in a
-  require: r.has Object = 0          #Room has zero objects in it
+  require: in r a
+  require: has r Object = 0          #Room has zero objects in it
   effect: delete r
   effect: delete p
   effect: create MovePhase
@@ -146,7 +146,7 @@ Action FinishDrawing GetAntidotesPhase p ActiveRoomHolder a Room r
 #RefillAssets
 
 Action RefillAssets RefillAssetsPhase p Container c
-  require: player.owns Asset < 3
+  require: owns player Asset < 3
   effect: distribute c player Asset 1 rand
 
 Action EndRefill RefillAssetsPhase p
