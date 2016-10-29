@@ -18,72 +18,142 @@ public class Object //Class makes sure it's a reference type
         _contains = new Dictionary<string, LinkedList<Object>>();
     }
 
-    public static bool In(Object a, Object b)
+    ////////////////////////////////////////////////////////
+    //                                                    //
+    //                   Begin Checkers                   //
+    //                                                    //
+    ////////////////////////////////////////////////////////
+
+    public bool equals(Object o)
     {
-        return Object.ReferenceEquals(a._in, b);
+        return Object.ReferenceEquals(this, o);
     }
 
-    public static bool RIn(Object a, Object b)
+    public Object Contains(Func<Object, bool> p)
     {
-        return In(a, b) || RInHelper(a._in, a, b, true);
-    }
-
-    protected static bool RInHelper(Object hare, Object tortise, 
-                                    Object goal, bool tStep)
-    {
-        if(!(hare != null) || Object.ReferenceEquals(tortise, hare))
+        Objects.Enumerator e = _contains.GetEnumerator();
+        Object ans;
+        while(e.MoveNext())
         {
-            return false;
+            ans = ListContains(e.Current.Value, p);
+            if(ans != null)
+            {
+                return ans;
+            }
         }
-        return In(hare, goal) || 
-            RInHelper(hare._in, (tStep ? tortise._in : tortise), goal, !tStep);
+        return null;
     }
 
-    public static bool In(string t, Object o)
+    public Object Contains(Func<Object, bool> p, string t)
     {
         ObjectList l;
-        if(!o._contains.TryGetValue(t, out l))
+        if(!_contains.TryGetValue(t, out l))
         {
-            return false;
+            return null;
         }
-        return l.Count > 0;
+        return ListContains(l, p);
     }
 
-    public static bool RIn(string t, Object o)
+    protected static Object ListContains(ObjectList l, Func<Object, bool> p)
     {
-        return RIn(t, o) || RInHelper(t, o, null);
-    }
-
-    protected static bool RInHelper(string t, Object curr, Object start)
-    {
-        //Note that the check to see if curr is null should only be necessary if
-        //the object tree is badly constructed (null entry in list).
-        if(!(curr != null) || Object.ReferenceEquals(curr, start))
+        ObjectList.Enumerator e = l.GetEnumerator();
+        while(e.MoveNext())
         {
-            return false;
+            if(p(e.Current))
+            {
+                return e.Current;
+            }
+        }
+        return null;
+    }
+
+    public Object RContains(Func<Object, bool> p)
+    {
+        return RContainsHelper(p, this);
+    }
+
+    //Currently a DFS
+    protected Object RContainsHelper(Func<Object, bool> p, Object start)
+    {
+        if(Object.ReferenceEquals(this, start))
+        {
+            return null;
         }
         if(!(start != null))
         {
-            start = curr;
+            start = this;
         }
-        if(RIn(t, curr))
+        if(p(this))
         {
-            return true;
+            return this;
         }
 
-        Objects.Enumerator e = curr._contains.GetEnumerator();
+        Objects.Enumerator e = _contains.GetEnumerator();
         ObjectList.Enumerator e2;
+        Object ans;
         while(e.MoveNext())
         {
             e2 = e.Current.Value.GetEnumerator();
             while(e2.MoveNext())
             {
-                if(RInHelper(t, e2.Current, start))
+                ans = e2.Current.RContainsHelper(p, start);
+                if(ans != null)
                 {
-                    return true;
+                    return ans;
                 }
             }
         }
-        return false;;
+        return null;
+    }
+
+    public bool Contains(Object o)
+    {
+        return Contains(o.equals) != null;
+    }
+
+    public bool Contains(string t)
+    {
+        return Contains((o => o.type == t)) != null;
+    }
+
+    ////////////////////////////////////////////////////////
+    //                                                    //
+    //                    Begin Actions                   //
+    //                                                    //
+    ////////////////////////////////////////////////////////
+
+    public Object ThrowOut(Object o)
+    {
+        ObjectList l = _contains[o.type];
+        l.Remove(o);
+        o._in = null;
+        return o;
+    }
+
+    //Remove this method and just make people use contains separately?
+    public Object ThrowOut(Func<Object, bool> p)
+    {
+        Object toChuck = Contains(p);
+        if(!(toChuck != null))
+        {
+            return null;
+        }
+        return ThrowOut(toChuck);
+    }
+
+    public void TakeIn(Object o)
+    {
+        if(o._in != null)
+        {
+            o._in.ThrowOut(o.equals);
+        }
+        ObjectList l;
+        if(!_contains.TryGetValue(o.type, out l))
+        {
+            l = new ObjectList();
+            _contains.Add(o.type, l);
+        }
+        l.AddFirst(o);
+        o._in = this;
     }
 }
