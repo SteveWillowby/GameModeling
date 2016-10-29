@@ -1,6 +1,6 @@
 #Move
 
-Action Move Track t Container MovePhase p
+Action Move Track t Container c MovePhase p
   require: m.in.in not null
   effect: m.in m.in.in
   effect: put c Token Rand(0,5)
