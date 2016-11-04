@@ -1,22 +1,22 @@
 MovePhase
 
 TrackCell t0
-  has: GreenCell
+  has GreenCell
 TrackCell t1
-  has: t0
-  has: GreenCell
+  has t0
+  has GreenCell
 TrackCell t2
-  has: t1
-  has: GreenCell
+  has t1
+  has GreenCell
 TrackCell t3
-  has: t2
-  has: RedCell
+  has t2
+  has RedCell
 TrackCell t4
-  has: t3
-  has: RoomCell
+  has t3
+  has RoomCell
 
 Marker m
-  in: t0
+  in t0
 
 Containter c
 
@@ -24,18 +24,18 @@ Containter c
 ######## All Assets ########
 
 Asset
-  in: c
-  has: FriendType
-  has: SpeedType
+  in c
+  has FriendType
+  has SpeedType
 
 Asset
-  in: c
-  has: SightType
+  in c
+  has SightType
 
 
 ######## All Rooms ########
 
 Room
-  in: c
-  has: SightType
-  has: SpeedType
+  in c
+  has SightType
+  has SpeedType
