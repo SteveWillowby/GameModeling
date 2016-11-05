@@ -1,5 +1,8 @@
-main: Main.cs Object.cs ObjectSet.cs Requirement.cs Effect.cs Player.cs Action.cs
-	mcs Main.cs Object.cs ObjectSet.cs Requirement.cs Effect.cs Player.cs Action.cs
+main: *.cs
+	mcs -out:bin/Main.exe *.cs
 
-objtest: testing/ObjTest.cs testing/TestRunner.cs old/Obj.cs old/IObj.cs
-	mcs testing/ObjTest.cs testing/TestRunner.cs old/Obj.cs old/IObj.cs
+objtest: testing/*.cs old/*.cs
+	mcs -out:bin/ObjTest.exe testing/*.cs old/*.cs
+
+parse: parsing/*.cs
+	mcs -out:bin/Parser.exe parsing/*.cs
