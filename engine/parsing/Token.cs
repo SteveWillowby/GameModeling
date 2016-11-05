@@ -5,24 +5,31 @@ public class Token
 {
     public enum Type
     {
-          Other
+          Unset
+        , Other
         , Reserved
         , Object
+        , ObjectType
         , Conditional
-        , Type
+        , Action
     };
 
-    protected Type type;
-    protected string val;
+    public Type type;
+    public string val;
 
-    public Token(string v, Type t)
+    public Token(string v)
     {
         if(v.IndexOf(' ') != -1)
         {
             throw new Exception("Cannot have a token with a ' ' in its value.");
         }
-        type = t;
+        type = Type.Unset;
         val = v;
+    }
+
+    public Token(string v, Type t) : this(v)
+    {
+        type = t;
     }
 
     public override string ToString() 

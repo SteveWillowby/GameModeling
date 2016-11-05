@@ -3,8 +3,8 @@ using System;
 
 public class Chunk
 {
-    protected Line header;
-    protected Line[] lines;
+    public Line header;
+    public Line[] lines;
 
     public Chunk(Line h, Line[] l)
     {

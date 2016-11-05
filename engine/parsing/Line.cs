@@ -3,12 +3,12 @@ using System;
 
 public class Line
 {
-    protected Token[] tokens;
-    protected int indent;
+    public Token[] tokens;
+    public int indent;
 
     protected static Char[] delimiters = {' '};
 
-    public Line(string l, Func<string, Token.Type> classifier)
+    public Line(string l)
     {
         //The following two lines remove initial spaces, saving the number in indent
         for(indent = 0; indent < l.Length && l[indent] == ' '; indent++) {}
@@ -18,7 +18,15 @@ public class Line
         tokens = new Token[s.Length];
         for(int i = 0; i < s.Length; i++)
         {
-            tokens[i] = new Token(s[i], classifier(s[i]));
+            tokens[i] = new Token(s[i]);
+        }
+    }
+
+    public void AssignTypes(Func<string, Token.Type> f)
+    {
+        for(int i = 0; i < tokens.Length; i++)
+        {
+            tokens[i].type = f(tokens[i].val);
         }
     }
 }
