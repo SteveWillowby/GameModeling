@@ -24,9 +24,9 @@ public class Object //Class makes sure it's a reference type
     //                                                    //
     ////////////////////////////////////////////////////////
 
-    public bool equals(Object o)
+    public override bool Equals(Object o)
     {
-        return Object.ReferenceEquals(this, o);
+        return o != null && Object.ReferenceEquals(this, o);
     }
 
     public Object Contains(Func<Object, bool> p)
@@ -75,7 +75,7 @@ public class Object //Class makes sure it's a reference type
     //Currently a DFS
     protected Object RContainsHelper(Func<Object, bool> p, Object start)
     {
-        if(Object.ReferenceEquals(this, start))
+        if(this == start)
         {
             return null;
         }
@@ -108,7 +108,7 @@ public class Object //Class makes sure it's a reference type
 
     public bool Contains(Object o)
     {
-        return Contains(o.equals) != null;
+        return Contains(o.Equals) != null;
     }
 
     public bool Contains(string t)
@@ -145,7 +145,7 @@ public class Object //Class makes sure it's a reference type
     {
         if(o._in != null)
         {
-            o._in.ThrowOut(o.equals);
+            o._in.ThrowOut(o.Equals);
         }
         ObjectList l;
         if(!_contains.TryGetValue(o.type, out l))
