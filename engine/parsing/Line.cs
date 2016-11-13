@@ -15,10 +15,24 @@ public class Line
         l = l.Substring(indent);
 
         string[] s = l.Split(delimiters);
-        tokens = new Token[s.Length];
+
+        //This loop is for removing whitespace
+        int numTokens = 0;
         for(int i = 0; i < s.Length; i++)
         {
-            tokens[i] = new Token(s[i]);
+            if(s[i].Length > 0)
+            {
+                numTokens++;
+            }
+        }
+
+        tokens = new Token[numTokens];
+        for(int i = 0; i < numTokens; i++)
+        {
+            if(s[i].Length > 0)
+            {
+                tokens[i] = new Token(s[i]);
+            }
         }
     }
 

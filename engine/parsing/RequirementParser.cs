@@ -76,6 +76,6 @@ public class RequirementParser
 
     protected static Object[] AllObjects(Object o, string[] path)
     {
-        return [];
+        return new Object[0];
     }
 }

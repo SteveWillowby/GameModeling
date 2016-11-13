@@ -24,9 +24,14 @@ public class Object //Class makes sure it's a reference type
     //                                                    //
     ////////////////////////////////////////////////////////
 
-    public override bool Equals(Object o)
+    public override bool Equals(System.Object o)
     {
         return o != null && Object.ReferenceEquals(this, o);
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
     }
 
     public Object Contains(Func<Object, bool> p)

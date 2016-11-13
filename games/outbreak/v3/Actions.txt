@@ -2,8 +2,8 @@
 
 Action Move Track t Container c MovePhase p
   require not in m.in null
-  effect put m.in m
-  effect put c Token Rand(0,5)
+  effect put m m.in
+  effect put Token c rand(0,5)
   effect delete p
   effect create UseTokensPhase
 
@@ -13,7 +13,7 @@ Action Move Track t Container c MovePhase p
 Action SpendToken Marker m Container c UseTokensPhase p
   require not in m.in null #Can this sort of check be automated?
   require contains c Token
-  effect put m.in m
+  effect put m m.in
   effect remove Token c 1 #How to best format this?
 
 Action Transition Container c UseTokensPhase p
@@ -31,22 +31,22 @@ Action StopAtRoom Container c Marker m UseTokensPhase p
 Action DrawAsset Container c Marker m SpacePhase p
   require contains c Asset
   require contains m.in GreenCell
-  effect distribute c player Asset 1 rand
+  effect distribute c player Asset 1
   effect delete p
   effect create MovePhase
-  effect Players Current.Left
+  effect players player.left
 
 Action LoseAsset Marker m SpacePhase p Asset a
   require contains m.in RedCell
   effect delete a
   effect delete p
   effect create MovePhase
-  effect Players Current.Left
+  effect players player.left
 
 Action EnterRoom Marker m SpacePhase p Container c
   require contains m.in RoomCell
   require contains c Question 15
-  effect distribute c All Question 15 rand
+  effect distribute c all Question 15
   effect delete p
   effect create SelectPhase
 
@@ -68,7 +68,7 @@ Action SelectRoom SelectPhase p ActiveRoomHolder a
   require contains a Room
   effect delete p
   effect create RoomPhase
-  effect Players All
+  effect players all
 
 
 #StartTimer
@@ -84,11 +84,11 @@ Action StartTimer StartTimerPhase p
 Action AskQuestion QuestionPhase p Container c Question q
   require timer > 0
   require owns player q
-  effect put c q
+  effect put q c
   effect disown q
 
 Action FinishQuestioning QuestionPhase p
-  effect take Current Question all
+  effect disown active Question all
   effect delete p
   effect create RoomPhase
 
@@ -98,11 +98,11 @@ Action FinishQuestioning QuestionPhase p
 Action SendAsset RoomPhase p MissionSlots m Asset a
   require owns player a
   require contains m Asset < 3      #m contains fewer than three Assets
-  effect put m a
+  effect put a m
 
 Action RecallAsset RoomPhase p MissionSlots m Asset a
   require in a m
-  effect take m a
+  effect remove a
 
 Action LockInAssets RoomPhase p
   effect delete p
@@ -113,13 +113,13 @@ Action LockInAssets RoomPhase p
 
 Action Succeed ResolvePhase p ActiveRoomHolder a Room r MissionSlots m
   require in r a
-  require rcontains m r.contains         #a recursive contains
+  require rcontains m r.contains            #checking for multiple objects
   effect delete p
   effect create GetAntidotesPhase
 
 Action Fail ResolvePhase p ActiveRoomHolder a Room r MissionSlots m
   require in r a
-  require not rcontains m r.contains     #a recursive contains
+  require not rcontains m r.contains
   effect delete r
   effect delete a.contains     #Delete all assets in a
   effect delete p
@@ -132,24 +132,24 @@ Action DrawAntidote GetAntidotesPhase p Container c ActiveRoomHolder a Room r
   require in r a
   require contains r Object a'      #Here Object indicates "any type"
   effect delete a'
-  effect put c Antidote Rand(0, 1)
+  effect put Antidote c rand(0, 1)
 
 Action FinishDrawing GetAntidotesPhase p ActiveRoomHolder a Room r
   require in r a
-  require contains r Object = 0          #Room contains zero objects in it
+  require contains r Object < 1          #Room contains zero objects in it
   effect delete r
   effect delete p
   effect create MovePhase
-  effect Players Former.Left
+  effect players former.left
 
 
 #RefillAssets
 
 Action RefillAssets RefillAssetsPhase p Container c
   require owns player Asset < 3
-  effect distribute c player Asset 1 rand
+  effect distribute c player Asset 1
 
 Action EndRefill RefillAssetsPhase p
-  effect Players Former.Left
+  effect players former.left
   effect delete p
   effect create MovePhase
