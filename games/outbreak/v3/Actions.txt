@@ -113,13 +113,13 @@ Action LockInAssets RoomPhase p
 
 Action Succeed ResolvePhase p ActiveRoomHolder a Room r MissionSlots m
   require in r a
-  require rcontains m r.contains            #checking for multiple objects
+  require rcontains m r.contains.type            #checking for multiple objects
   effect delete p
   effect create GetAntidotesPhase
 
 Action Fail ResolvePhase p ActiveRoomHolder a Room r MissionSlots m
   require in r a
-  require not rcontains m r.contains
+  require not rcontains m r.contains.type
   effect delete r
   effect delete a.contains     #Delete all assets in a
   effect delete p
