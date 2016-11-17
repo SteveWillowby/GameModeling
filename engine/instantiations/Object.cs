@@ -121,6 +121,41 @@ public class Object //Class makes sure it's a reference type
         return Contains((o => o.type == t)) != null;
     }
 
+    public Object In(Func<Object, bool> p)
+    {
+        if(p(_in))
+        {
+            return _in;
+        }
+        return null;
+    }
+
+    public Object RIn(Func<Object, bool> p)
+    {
+        if(_in == null)
+        {
+            return null;
+        }
+        return _in.RInHelper(p, this, false);
+    }
+
+    protected Object RInHelper(Func<Object, bool> p, Object tortoise, bool step)
+    {
+        if(p(this))
+        {
+            return this;
+        }
+        if(this == tortoise)
+        {
+            return null;
+        }
+        if(step)
+        {
+            tortoise = tortoise._in;
+        }
+        return _in.RInHelper(p, tortoise, !step);
+    }
+
     ////////////////////////////////////////////////////////
     //                                                    //
     //                    Begin Actions                   //
