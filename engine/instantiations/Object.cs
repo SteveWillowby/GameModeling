@@ -121,6 +121,16 @@ public class Object //Class makes sure it's a reference type
         return Contains((o => o.type == t)) != null;
     }
 
+    public bool RContains(Object o)
+    {
+        return RContains(o.Equals) != null;
+    }
+
+    public bool RContains(string t)
+    {
+        return RContains((o => o.type == t)) != null;
+    }
+
     public Object In(Func<Object, bool> p)
     {
         if(p(_in))
@@ -154,6 +164,40 @@ public class Object //Class makes sure it's a reference type
             tortoise = tortoise._in;
         }
         return _in.RInHelper(p, tortoise, !step);
+    }
+
+    public bool RIn(Object o)
+    {
+        return RIn(o.Equals) != null;
+    }
+
+    public bool RIn(string t)
+    {
+        return RIn((o => o.type == t)) != null;
+    }
+
+    public Object[] ContainsAsArray()
+    {
+        int totalSize = 0;
+        Objects.Enumerator e = _contains.GetEnumerator();
+        while(e.MoveNext())
+        {
+            totalSize += e.Current.Value.Count;
+        }
+
+        Object[] ret = new Object[totalSize];
+        int idx = 0;
+        e = _contains.GetEnumerator();
+        while(e.MoveNext())
+        {
+            ObjectList.Enumerator e2 = e.Current.Value.GetEnumerator();
+            while(e2.MoveNext())
+            {
+                ret[idx] = e2.Current;
+                idx++;
+            }
+        }
+        return ret;
     }
 
     ////////////////////////////////////////////////////////

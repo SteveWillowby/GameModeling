@@ -3,14 +3,14 @@ using System;
 
 public class RequirementParser
 {
-    public enum Type 
+    public enum Type
     {
         In
+        , RIn
         , Contains
+        , RContains
         , Owns
         , Timer
-        , RIn
-        , RContains
     };
 
     protected static char[] dot = {'.'};
@@ -23,30 +23,29 @@ public class RequirementParser
         Func<Object[], bool> evaluator = o => true;
         int[] indices;
 
-        string type = line.tokens[1 + offset].val;
+        string t = line.tokens[1 + offset].val;
+        Type type = ParseType(t);
 
-        if(type == "owns")
+        indices = new int[0];
+        if(type == Type.Owns)
         {
-            indices = new int[0];
         }
-        else if(type == "timer")
+        else if(type == Type.Timer)
         {
-            indices = new int[0];
         }
-        else // in/contains stuff
+        else if(type == Type.In || type == Type.RIn || type == Type.Contains ||
+                type == Type.RContains)
         {
-            indices = new int[0];
-
             string[] thing1 = line.tokens[2 + offset].val.Split(dot);
             string[] thing2 = line.tokens[3 + offset].val.Split(dot);
             int index1 = ObjectIndex(header, thing1[0]);
             if(index1 == -1)
             {
-                throw new Exception("In/Contains require and object");
+                throw new Exception("In/Contains require an object");
             }
             int index2 = ObjectIndex(header, thing2[0]);
 
-            if(type == "in")
+            if(type == Type.In)
             {
                 if(index2 != -1)
                 {
@@ -62,6 +61,21 @@ public class RequirementParser
         return new Requirement(evaluator, indices);
     }
 
+    protected static Type ParseType(string t)
+    {
+        switch(t)
+        {
+            case "in":
+                return Type.In;
+            case "rin":
+                return Type.RIn;
+            case "contains":
+                return Type.Contains;
+            default:
+                throw new Exception("Invalid requirement type " + t);
+        }
+    }
+
     protected static int ObjectIndex(Line header, string o)
     {
         for(int i = 3; i < header.tokens.Length; i += 2)
@@ -74,8 +88,52 @@ public class RequirementParser
         return -1;
     }
 
-    protected static Object[] AllObjects(Object o, string[] path)
+    protected static bool CheckOnAll<T>(Func<T, bool> p, T[] o)
     {
-        return new Object[0];
+        for(int i = 0; i < o.Length; i++)
+        {
+            if(!p(o[i]))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    protected static Func<Object, bool> CheckOnAll(Type requirement, Object[] o)
+    {
+        if(requirement == Type.Contains)
+        {
+            return o2 => CheckOnAll<Object>(o2.Contains, o);
+        }
+        if(requirement == Type.RContains)
+        {
+            return o2 => CheckOnAll<Object>(o2.RContains, o);
+        }
+        throw new Exception("Invalid requirement passed to CheckOnAll");
+    }
+
+    protected static Func<Object, bool> CheckOnAll(Type requirement, string[] t)
+    {
+        if(requirement == Type.Contains)
+        {
+            return o2 => CheckOnAll<string>(o2.Contains, t);
+        }
+        if(requirement == Type.RContains)
+        {
+            return o2 => CheckOnAll<string>(o2.RContains, t);
+        }
+        throw new Exception("Invalid requirement passed to CheckOnAll");
+    }
+
+    protected static Object WalkInChain(Object o, string[] fullPath)
+    {
+        //fullPath[0] is the object's name
+        int i;
+        for(i = 1; i < fullPath.Length && fullPath[i] == "in"; i++)
+        {
+            o = o._in; //could be null!
+        }
+        return o;
     }
 }
