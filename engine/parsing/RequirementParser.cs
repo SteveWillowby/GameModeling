@@ -218,6 +218,8 @@ public class RequirementParser
                 return Type.RIn;
             case "contains":
                 return Type.Contains;
+            case "rcontains":
+                return Type.RContains;
             default:
                 throw new Exception("Invalid requirement type " + t);
         }

@@ -14,8 +14,11 @@ public class MainClass
         Object o = new Object("pizza");
         Console.WriteLine ("Pizza for lunch. Pizza for dinner.");
         Console.WriteLine (o.type);
-        Func<int> returnsNumber = test1(3);
-        Console.WriteLine ("" + test1(5)());
-        Console.WriteLine ("" + returnsNumber());
+        int passIn = 3;
+        Func<int> returnsNumber = test1(passIn);
+        passIn = 8;
+
+        Console.WriteLine ("" + test1(5)()); //prints out 10
+        Console.WriteLine ("" + returnsNumber()); //prints out 6
     }
 }
