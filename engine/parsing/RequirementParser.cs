@@ -36,24 +36,155 @@ public class RequirementParser
         else if(type == Type.In || type == Type.RIn || type == Type.Contains ||
                 type == Type.RContains)
         {
-            string[] thing1 = line.tokens[2 + offset].val.Split(dot);
-            string[] thing2 = line.tokens[3 + offset].val.Split(dot);
-            int index1 = ObjectIndex(header, thing1[0]);
-            if(index1 == -1)
+            string[] arg1 = line.tokens[2 + offset].val.Split(dot);
+            string[] arg2 = line.tokens[3 + offset].val.Split(dot);
+            int argIdx1 = ObjectIndex(header, arg1[0]);
+            if(argIdx1 == -1)
             {
                 throw new Exception("In/Contains require an object");
             }
-            int index2 = ObjectIndex(header, thing2[0]);
+            int argIdx2 = ObjectIndex(header, arg2[0]);
 
             if(type == Type.In)
             {
-                if(index2 != -1)
+                if(argIdx2 != -1 && arg1[arg1.Length - 1] == "type")
                 {
-                    
+                    evaluator = o => {
+                        Object o1 = WalkInChain(o[argIdx1], arg1);
+                        Object o2 = WalkInChain(o[argIdx2], arg2);
+                        return o1.In(o2.type);
+                    };
+                }
+                else if(argIdx2 != -1)
+                {
+                    evaluator = o => {
+                        Object o1 = WalkInChain(o[argIdx1], arg1);
+                        Object o2 = WalkInChain(o[argIdx2], arg2);
+                        return o1.In(o2);
+                    };
                 }
                 else
                 {
-                    
+                    evaluator = o => {
+                        Object o1 = WalkInChain(o[argIdx1], arg1);
+                        return o1.In(arg2[0]);
+                    };
+                }
+            }
+            else if(type == Type.RIn)
+            {
+                if(argIdx2 != -1 && arg1[arg1.Length - 1] == "type")
+                {
+                    evaluator = o => {
+                        Object o1 = WalkInChain(o[argIdx1], arg1);
+                        Object o2 = WalkInChain(o[argIdx2], arg2);
+                        return o1.RIn(o2.type);
+                    };
+                }
+                else if(argIdx2 != -1)
+                {
+                    evaluator = o => {
+                        Object o1 = WalkInChain(o[argIdx1], arg1);
+                        Object o2 = WalkInChain(o[argIdx2], arg2);
+                        return o1.RIn(o2);
+                    };
+                }
+                else
+                {
+                    evaluator = o => {
+                        Object o1 = WalkInChain(o[argIdx1], arg1);
+                        return o1.RIn(arg2[0]);
+                    };
+                }
+            }
+            else if(type == Type.Contains)
+            {
+                if(argIdx2 != -1 && arg1[arg1.Length - 1] == "type" &&
+                    arg1.Length > 1 && arg1[arg1.Length - 2] == "contains")
+                {
+                    evaluator = o => {
+                        Object o1 = WalkInChain(o[argIdx1], arg1);
+                        Object o2 = WalkInChain(o[argIdx2], arg2);
+                        return CheckForAll(o3 => o1.Contains(o3.type),
+                                            o2.ContainsAsArray());
+                    };
+                }
+                else if(argIdx2 != -1 && arg1[arg1.Length - 1] == "type")
+                {
+                    evaluator = o => {
+                        Object o1 = WalkInChain(o[argIdx1], arg1);
+                        Object o2 = WalkInChain(o[argIdx2], arg2);
+                        return o1.Contains(o2.type);
+                    };
+                }
+                else if(argIdx2 != -1 && arg1[arg1.Length - 1] == "contains")
+                {
+                    evaluator = o => {
+                        Object o1 = WalkInChain(o[argIdx1], arg1);
+                        Object o2 = WalkInChain(o[argIdx2], arg2);
+                        return CheckForAll(o3 => o1.Contains(o3),
+                                            o2.ContainsAsArray());
+                    };
+                }
+                else if(argIdx2 != -1)
+                {
+                    evaluator = o => {
+                        Object o1 = WalkInChain(o[argIdx1], arg1);
+                        Object o2 = WalkInChain(o[argIdx2], arg2);
+                        return o1.Contains(o2);
+                    };
+                }
+                else
+                {
+                    evaluator = o => {
+                        Object o1 = WalkInChain(o[argIdx1], arg1);
+                        return o1.Contains(arg2[0]);
+                    };
+                }
+            }
+            else if(type == Type.RContains)
+            {
+                if(argIdx2 != -1 && arg1[arg1.Length - 1] == "type" &&
+                    arg1.Length > 1 && arg1[arg1.Length - 2] == "contains")
+                {
+                    evaluator = o => {
+                        Object o1 = WalkInChain(o[argIdx1], arg1);
+                        Object o2 = WalkInChain(o[argIdx2], arg2);
+                        return CheckForAll(o3 => o1.RContains(o3.type),
+                                            o2.ContainsAsArray());
+                    };
+                }
+                else if(argIdx2 != -1 && arg1[arg1.Length - 1] == "type")
+                {
+                    evaluator = o => {
+                        Object o1 = WalkInChain(o[argIdx1], arg1);
+                        Object o2 = WalkInChain(o[argIdx2], arg2);
+                        return o1.RContains(o2.type);
+                    };
+                }
+                else if(argIdx2 != -1 && arg1[arg1.Length - 1] == "contains")
+                {
+                    evaluator = o => {
+                        Object o1 = WalkInChain(o[argIdx1], arg1);
+                        Object o2 = WalkInChain(o[argIdx2], arg2);
+                        return CheckForAll(o3 => o1.Contains(o3),
+                                            o2.ContainsAsArray());
+                    };
+                }
+                else if(argIdx2 != -1)
+                {
+                    evaluator = o => {
+                        Object o1 = WalkInChain(o[argIdx1], arg1);
+                        Object o2 = WalkInChain(o[argIdx2], arg2);
+                        return o1.RContains(o2);
+                    };
+                }
+                else
+                {
+                    evaluator = o => {
+                        Object o1 = WalkInChain(o[argIdx1], arg1);
+                        return o1.RContains(arg2[0]);
+                    };
                 }
             }
         }
@@ -88,7 +219,7 @@ public class RequirementParser
         return -1;
     }
 
-    protected static bool CheckOnAll<T>(Func<T, bool> p, T[] o)
+    protected static bool CheckForAll(Func<Object, bool> p, Object[] o)
     {
         for(int i = 0; i < o.Length; i++)
         {
@@ -98,32 +229,6 @@ public class RequirementParser
             }
         }
         return true;
-    }
-
-    protected static Func<Object, bool> CheckOnAll(Type requirement, Object[] o)
-    {
-        if(requirement == Type.Contains)
-        {
-            return o2 => CheckOnAll<Object>(o2.Contains, o);
-        }
-        if(requirement == Type.RContains)
-        {
-            return o2 => CheckOnAll<Object>(o2.RContains, o);
-        }
-        throw new Exception("Invalid requirement passed to CheckOnAll");
-    }
-
-    protected static Func<Object, bool> CheckOnAll(Type requirement, string[] t)
-    {
-        if(requirement == Type.Contains)
-        {
-            return o2 => CheckOnAll<string>(o2.Contains, t);
-        }
-        if(requirement == Type.RContains)
-        {
-            return o2 => CheckOnAll<string>(o2.RContains, t);
-        }
-        throw new Exception("Invalid requirement passed to CheckOnAll");
     }
 
     protected static Object WalkInChain(Object o, string[] fullPath)

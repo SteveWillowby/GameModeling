@@ -140,6 +140,16 @@ public class Object //Class makes sure it's a reference type
         return null;
     }
 
+    public bool In(Object o)
+    {
+        return In(o.Equals) != null;
+    }
+
+    public bool In(string t)
+    {
+        return In((o => o.type == t)) != null;
+    }
+
     public Object RIn(Func<Object, bool> p)
     {
         if(_in == null)
