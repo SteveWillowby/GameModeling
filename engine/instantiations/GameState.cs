@@ -7,27 +7,18 @@ using Objects = System.Collections.Generic.Dictionary<string,
 
 public class GameState
 {
-    protected static Objects all = new Objects();
+    protected static ObjectSet all = new ObjectSet();
 
     public static Object AddObject(string type)
     {
         Object o = new Object(type);
-        //This functionality can be found in the Object class (TakeIn())
-        ObjectList l;
-        if(!all.TryGetValue(o.type, out l))
-        {
-            l = new ObjectList();
-            all.Add(o.type, l);
-        }
-        l.AddFirst(o);
+        all.TakeIn(o);
         return o;
     }
 
     //Assumes o is in all
     public static void RemoveObject(Object o)
     {
-        //This functionality may be found in the ObjectClass (ThrowOut())
-        ObjectList l = all[o.type];
-        l.Remove(o);
+        all.ThrowOut(o);
     }
 }

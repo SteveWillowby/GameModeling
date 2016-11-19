@@ -45,11 +45,24 @@ public class EffectParser
             }
             else if(line.tokens.Length == 4)
             {
-                //Need a way to create an object registered with the game state
+                affector = o => {
+                    Object o2 = WalkInChain(o[argIdx2], arg2);
+                    Object fresh = GameState.AddObject(arg1[0]);
+                    o2.TakeIn(fresh);
+                };
             }
             else if(line.tokens.Length == 5)
             {
-                //Need a way to create an object registered with the game state
+                affector = o => {
+                    Object o2 = WalkInChain(o[argIdx2], arg2);
+                    Object fresh;
+                    int numObjects = Int32.Parse(line.tokens[4].val);
+                    for(int i = 0; i < numObjects; i++)
+                    {
+                        fresh = GameState.AddObject(arg1[0]);
+                        o2.TakeIn(fresh);
+                    }
+                };
             }
         }
         else if(type == Type.Remove)

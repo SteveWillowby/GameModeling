@@ -9,13 +9,13 @@ public class Object //Class makes sure it's a reference type
 {
     public string type;
     public Object _in; //"in" is taken
-    public Dictionary<string, LinkedList<Object>> _contains;
+    public ObjectSet _contains;
 
     public Object(string t)
     {
         type = t;
         _in = null;
-        _contains = new Dictionary<string, LinkedList<Object>>();
+        _contains = new ObjectSet();
     }
 
     ////////////////////////////////////////////////////////
@@ -36,79 +36,17 @@ public class Object //Class makes sure it's a reference type
 
     public Object Contains(Func<Object, bool> p)
     {
-        Objects.Enumerator e = _contains.GetEnumerator();
-        Object ans;
-        while(e.MoveNext())
-        {
-            ans = ListContains(e.Current.Value, p);
-            if(ans != null)
-            {
-                return ans;
-            }
-        }
-        return null;
+        return _contains.Contains(p);
     }
 
     public Object Contains(Func<Object, bool> p, string t)
     {
-        ObjectList l;
-        if(!_contains.TryGetValue(t, out l))
-        {
-            return null;
-        }
-        return ListContains(l, p);
-    }
-
-    protected static Object ListContains(ObjectList l, Func<Object, bool> p)
-    {
-        ObjectList.Enumerator e = l.GetEnumerator();
-        while(e.MoveNext())
-        {
-            if(p(e.Current))
-            {
-                return e.Current;
-            }
-        }
-        return null;
+        return _contains.Contains(p, t);
     }
 
     public Object RContains(Func<Object, bool> p)
     {
-        return RContainsHelper(p, this);
-    }
-
-    //Currently a DFS
-    protected Object RContainsHelper(Func<Object, bool> p, Object start)
-    {
-        if(this == start)
-        {
-            return null;
-        }
-        if(!(start != null))
-        {
-            start = this;
-        }
-        if(p(this))
-        {
-            return this;
-        }
-
-        Objects.Enumerator e = _contains.GetEnumerator();
-        ObjectList.Enumerator e2;
-        Object ans;
-        while(e.MoveNext())
-        {
-            e2 = e.Current.Value.GetEnumerator();
-            while(e2.MoveNext())
-            {
-                ans = e2.Current.RContainsHelper(p, start);
-                if(ans != null)
-                {
-                    return ans;
-                }
-            }
-        }
-        return null;
+        return _contains.RContains(p);
     }
 
     public bool Contains(Object o)
@@ -188,26 +126,7 @@ public class Object //Class makes sure it's a reference type
 
     public Object[] ContainsAsArray()
     {
-        int totalSize = 0;
-        Objects.Enumerator e = _contains.GetEnumerator();
-        while(e.MoveNext())
-        {
-            totalSize += e.Current.Value.Count;
-        }
-
-        Object[] ret = new Object[totalSize];
-        int idx = 0;
-        e = _contains.GetEnumerator();
-        while(e.MoveNext())
-        {
-            ObjectList.Enumerator e2 = e.Current.Value.GetEnumerator();
-            while(e2.MoveNext())
-            {
-                ret[idx] = e2.Current;
-                idx++;
-            }
-        }
-        return ret;
+        return _contains.ContainsAsArray();
     }
 
     ////////////////////////////////////////////////////////
@@ -218,21 +137,12 @@ public class Object //Class makes sure it's a reference type
 
     public Object ThrowOut(Object o)
     {
-        ObjectList l = _contains[o.type];
-        l.Remove(o);
-        o._in = null;
-        return o;
+        return _contains.ThrowOut(o);
     }
 
-    //Remove this method and just make people use contains separately?
     public Object ThrowOut(Func<Object, bool> p)
     {
-        Object toChuck = Contains(p);
-        if(!(toChuck != null))
-        {
-            return null;
-        }
-        return ThrowOut(toChuck);
+        return _contains.ThrowOut(p);
     }
 
     public void TakeIn(Object o)
@@ -241,13 +151,7 @@ public class Object //Class makes sure it's a reference type
         {
             o._in.ThrowOut(o.Equals);
         }
-        ObjectList l;
-        if(!_contains.TryGetValue(o.type, out l))
-        {
-            l = new ObjectList();
-            _contains.Add(o.type, l);
-        }
-        l.AddFirst(o);
+        _contains.TakeIn(o);
         o._in = this;
     }
 }
