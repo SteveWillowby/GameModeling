@@ -21,6 +21,7 @@ Object Room
 
 Object Asset
 
+Object InitPhase
 Object MovePhase
 Object UseTokensPhase
 Object SpacePhase

@@ -1,3 +1,15 @@
+#Init
+
+Action DrawAssets InitPhase p Container c
+  require owns player Asset < 3
+  effect distribute c player Asset 1
+
+Action EndDrawing InitPhase p
+  effect players player
+  effect delete p
+  effect create MovePhase
+
+
 #Move
 
 Action Move Track t Container c MovePhase p
@@ -43,21 +55,17 @@ Action LoseAsset Marker m SpacePhase p Asset a
   effect create MovePhase
   effect players player.left
 
-Action EnterRoom Marker m SpacePhase p Container c
+Action EnterRoom Marker m SpacePhase p
   require contains m.in RoomCell
-  require contains c Question 15
-  effect distribute c all Question 15
   effect delete p
   effect create SelectPhase
 
 
 #SelectRoom
 
-Action SelectRoom SelectPhase p Container c ActiveRoomHolder a
+Action InitRoom SelectPhase p Container c ActiveRoomHolder a
   require not contains a Room
   effect takeput c a Room 1 rand
-  effect delete p
-  effect create RoomPhase
 
 Action RejectRoom SelectPhase p Container c ActiveRoomHolder a Room r
   require in r a
@@ -67,13 +75,14 @@ Action RejectRoom SelectPhase p Container c ActiveRoomHolder a Room r
 Action SelectRoom SelectPhase p ActiveRoomHolder a
   require contains a Room
   effect delete p
-  effect create RoomPhase
+  effect create StartTimerPhase
   effect players all
 
 
 #StartTimer
 
-Action StartTimer StartTimerPhase p
+Action StartTimer StartTimerPhase p Container c
+  effect distribute c all Question 15
   effect set timer 120         #set timer for 2 minutes
   effect delete p
   effect create QuestionPhase

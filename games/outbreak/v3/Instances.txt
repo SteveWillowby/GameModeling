@@ -1,4 +1,5 @@
-MovePhase
+players all
+InitPhase
 
 TrackCell t0
   contains GreenCell
