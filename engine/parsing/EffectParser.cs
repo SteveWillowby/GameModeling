@@ -26,6 +26,31 @@ public class EffectParser
 
         if(type == Type.Put)
         {
+            string[] arg1 = line.tokens[2].val.Split(dot);
+            string[] arg2 = line.tokens[3].val.Split(dot);
+            int argIdx1 = ObjectIndex(header, arg1[0]);
+            int argIdx2 = ObjectIndex(header, arg2[0]);
+            if(argIdx2 == -1)
+            {
+                throw new Exception("Put requires an object");
+            }
+
+            if(argIdx1 != -1)
+            {
+                affector = o => {
+                    Object o1 = WalkInChain(o[argIdx1], arg1);
+                    Object o2 = WalkInChain(o[argIdx2], arg2);
+                    o2.TakeIn(o1);
+                };
+            }
+            else if(line.tokens.Length == 4)
+            {
+                //Need a way to create an object registered with the game state
+            }
+            else if(line.tokens.Length == 5)
+            {
+                //Need a way to create an object registered with the game state
+            }
         }
         else if(type == Type.Remove)
         {
@@ -72,5 +97,31 @@ public class EffectParser
             default:
                 throw new Exception("Invalid requirement type " + t);
         }
+    }
+
+    //Note that this code is duplicated in RequirementParser.
+    //Perhaps this should be moved to Action?
+    protected static int ObjectIndex(Line header, string o)
+    {
+        for(int i = 3; i < header.tokens.Length; i += 2)
+        {
+            if(header.tokens[i].val == o)
+            {
+                return (i - 3) / 2;
+            }
+        }
+        return -1;
+    }
+
+    //This method is duplicated in RequirementParser
+    protected static Object WalkInChain(Object o, string[] fullPath)
+    {
+        //fullPath[0] is the object's name
+        int i;
+        for(i = 1; i < fullPath.Length && fullPath[i] == "in"; i++)
+        {
+            o = o._in; //could be null!
+        }
+        return o;
     }
 }
