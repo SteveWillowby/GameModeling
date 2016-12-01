@@ -3,7 +3,7 @@ using System;
 
 public class Line
 {
-    public Token[] tokens;
+    public string[] tokens;
     public int indent;
 
     protected static Char[] delimiters = {' '};
@@ -26,21 +26,13 @@ public class Line
             }
         }
 
-        tokens = new Token[numTokens];
+        tokens = new string[numTokens];
         for(int i = 0; i < numTokens; i++)
         {
             if(s[i].Length > 0)
             {
-                tokens[i] = new Token(s[i]);
+                tokens[i] = s[i];
             }
-        }
-    }
-
-    public void AssignTypes(Func<string, Token.Type> f)
-    {
-        for(int i = 0; i < tokens.Length; i++)
-        {
-            tokens[i].type = f(tokens[i].val);
         }
     }
 }
