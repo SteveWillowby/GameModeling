@@ -17,13 +17,13 @@ public class RequirementParser
 
     public Requirement Parse(Line header, Line line)
     {
-        bool negate = line.tokens[1].val == "not";
+        bool negate = line.tokens[1] == "not";
         int offset = negate ? 1 : 0;
 
         Func<Object[], bool> evaluator = o => true;
         //int[] indices;
 
-        string t = line.tokens[1 + offset].val;
+        string t = line.tokens[1 + offset];
         Type type = ParseType(t);
 
         //indices = new int[0];
@@ -37,8 +37,8 @@ public class RequirementParser
         else if(type == Type.In || type == Type.RIn ||
                 type == Type.Contains || type == Type.RContains)
         {
-            string[] arg1 = line.tokens[2 + offset].val.Split(dot);
-            string[] arg2 = line.tokens[3 + offset].val.Split(dot);
+            string[] arg1 = line.tokens[2 + offset].Split(dot);
+            string[] arg2 = line.tokens[3 + offset].Split(dot);
             int argIdx1 = ObjectIndex(header, arg1[0]);
             if(argIdx1 == -1)
             {
@@ -229,7 +229,7 @@ public class RequirementParser
     {
         for(int i = 3; i < header.tokens.Length; i += 2)
         {
-            if(header.tokens[i].val == o)
+            if(header.tokens[i] == o)
             {
                 return (i - 3) / 2;
             }

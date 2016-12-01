@@ -21,13 +21,13 @@ public class EffectParser
     {
         Action<Object[]> affector = o => {};
 
-        string t = line.tokens[1].val;
+        string t = line.tokens[1];
         Type type = ParseType(t);
 
         if(type == Type.Put)
         {
-            string[] arg1 = line.tokens[2].val.Split(dot);
-            string[] arg2 = line.tokens[3].val.Split(dot);
+            string[] arg1 = line.tokens[2].Split(dot);
+            string[] arg2 = line.tokens[3].Split(dot);
             int argIdx1 = ObjectIndex(header, arg1[0]);
             int argIdx2 = ObjectIndex(header, arg2[0]);
             if(argIdx2 == -1)
@@ -56,7 +56,7 @@ public class EffectParser
                 affector = o => {
                     Object o2 = WalkInChain(o[argIdx2], arg2);
                     Object fresh;
-                    int numObjects = Int32.Parse(line.tokens[4].val);
+                    int numObjects = Int32.Parse(line.tokens[4]);
                     for(int i = 0; i < numObjects; i++)
                     {
                         fresh = GameState.AddObject(arg1[0]);
@@ -118,7 +118,7 @@ public class EffectParser
     {
         for(int i = 3; i < header.tokens.Length; i += 2)
         {
-            if(header.tokens[i].val == o)
+            if(header.tokens[i] == o)
             {
                 return (i - 3) / 2;
             }
