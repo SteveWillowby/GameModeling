@@ -8,13 +8,13 @@ public class GameState
     public static Object AddObject(string type)
     {
         Object o = new Object(type);
-        all.TakeIn(o);
+        all.Add(o);
         return o;
     }
 
     //Assumes o is in all
     public static void RemoveObject(Object o)
     {
-        all.ThrowOut(o);
+        all.RemoveFirst(o2 => o == o2, o2 => {});
     }
 }

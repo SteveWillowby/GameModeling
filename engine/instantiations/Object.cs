@@ -112,7 +112,7 @@ public class Object //Class makes sure it's a reference type
 
     public bool RIn(string t)
     {
-        return RIn((o => o.type == t)) != null;
+        return RIn(o => o.type == t) != null;
     }
 
     ////////////////////////////////////////////////////////
@@ -121,14 +121,24 @@ public class Object //Class makes sure it's a reference type
     //                                                    //
     ////////////////////////////////////////////////////////
 
+    protected void NullifyIn(Object o)
+    {
+        o._in = null;
+    }
+
     public Object ThrowOut(Object o)
     {
-        return _contains.ThrowOut(o);
+        return _contains.RemoveFirst(o2 => o2 == o, NullifyIn);
     }
 
     public Object ThrowOut(Func<Object, bool> p)
     {
-        return _contains.ThrowOut(p);
+        return _contains.RemoveFirst(p, NullifyIn);
+    }
+
+    public void ThrowOutAll(Func<Object, bool> p)
+    {
+        _contains.RemoveAll(p, NullifyIn);
     }
 
     public void TakeIn(Object o)
@@ -137,7 +147,7 @@ public class Object //Class makes sure it's a reference type
         {
             o._in.ThrowOut(o.Equals);
         }
-        _contains.TakeIn(o);
+        _contains.Add(o);
         o._in = this;
     }
 }

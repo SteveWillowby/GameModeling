@@ -2,8 +2,7 @@ using System.Collections.Generic;
 using System;
 
 using ObjectList = System.Collections.Generic.LinkedList<Object>;
-using Objects = System.Collections.Generic.Dictionary<string, 
-        System.Collections.Generic.LinkedList<Object>>;
+using ObjectListNode = System.Collections.Generic.LinkedListNode<Object>;
 
 public class ObjectSet
 {
@@ -57,35 +56,19 @@ public class ObjectSet
     //                                                    //
     ////////////////////////////////////////////////////////
 
-    public Object ThrowOut(Object o)
-    {
-        objects.Remove(o);
-        return o;
-    }
 
-    //Remove this method and just make people use contains separately?
-    public Object ThrowOut(Func<Object, bool> p)
+    protected Object ForEachUntil(Func<ObjectListNode, Object> f)
     {
-        Object toChuck = Contains(p);
-        if(!(toChuck != null))
-        {
-            return null;
-        }
-        return ThrowOut(toChuck);
-    }
-
-    public void TakeIn(Object o)
-    {
-        objects.AddFirst(o);
-    }
-
-    public Object ForEachUntil(Func<Object, Object> f)
-    {
-        ObjectList.Enumerator e = objects.GetEnumerator();
+        ObjectListNode n = objects.First;
+        ObjectListNode old;
         Object res;
-        while(e.MoveNext())
+
+        while(n != objects.Last)
         {
-            res = f(e.Current);
+            old = n;
+            n = n.Next;
+
+            res = f(old);
             if(res != null)
             {
                 return res;
@@ -93,22 +76,59 @@ public class ObjectSet
         }
         return null;
     }
+ 
+    public Object ForEachUntil(Func<Object, Object> f)
+    {
+        return ForEachUntil(n => f(n.Value));
+    }
 
     public Object ForEachUntil(Func<Object, bool> f)
     {
-        ObjectList.Enumerator e = objects.GetEnumerator();
-        while(e.MoveNext())
-        {
-            if(f(e.Current))
-            {
-                return e.Current;
-            }
-        }
-        return null;
+        return ForEachUntil(o => {
+                if(f(o))
+                {
+                    return o;
+                }
+                return null;
+            });
     }
 
     public void ForEach(Action<Object> f)
     {
-        ForEachUntil(o => {f(o); return true;});
+        ForEachUntil(o => {f(o); return null;});
+    }
+
+    public void Add(Object o)
+    {
+        objects.AddFirst(o);
+    }
+
+    public Object RemoveFirst(Func<Object, bool> p, Action<Object> f)
+    {
+        return ForEachUntil(
+            n => {
+                Object o = n.Value;
+                if(p(o))
+                {
+                    objects.Remove(n);
+                    f(o);
+                    return o;
+                }
+                return null;
+            });
+    }
+
+    public void RemoveAll(Func<Object, bool> p, Action<Object> f)
+    {
+        ForEachUntil(
+            n => {
+                Object o = n.Value;
+                if(p(o))
+                {
+                    objects.Remove(n);
+                    f(o);
+                }
+                return null;
+            });
     }
 }
