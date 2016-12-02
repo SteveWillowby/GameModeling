@@ -136,6 +136,16 @@ public class Object //Class makes sure it's a reference type
         return _contains.RemoveFirst(p, NullifyIn);
     }
 
+    public Object ThrowOutN(Object o, int N)
+    {
+        return _contains.RemoveN(o2 => o2 == o, NullifyIn, N);
+    }
+
+    public Object ThrowOutN(Func<Object, bool> p, int N)
+    {
+        return _contains.RemoveN(p, NullifyIn, N);
+    }
+
     public void ThrowOutAll(Func<Object, bool> p)
     {
         _contains.RemoveAll(p, NullifyIn);

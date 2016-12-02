@@ -103,8 +103,10 @@ public class ObjectSet
         objects.AddFirst(o);
     }
 
-    public Object RemoveFirst(Func<Object, bool> p, Action<Object> f)
+    //Returns the last object removed (null if none are removed)
+    public Object RemoveN(Func<Object, bool> p, Action<Object> f, int N)
     {
+        int count = 0;
         return ForEachUntil(
             n => {
                 Object o = n.Value;
@@ -112,23 +114,23 @@ public class ObjectSet
                 {
                     objects.Remove(n);
                     f(o);
-                    return o;
+                    count++;
+                    if(count == N)
+                    {
+                        return o;
+                    }
                 }
                 return null;
             });
     }
 
+    public Object RemoveFirst(Func<Object, bool> p, Action<Object> f)
+    {
+        return RemoveN(p, f, 1);
+    }
+
     public void RemoveAll(Func<Object, bool> p, Action<Object> f)
     {
-        ForEachUntil(
-            n => {
-                Object o = n.Value;
-                if(p(o))
-                {
-                    objects.Remove(n);
-                    f(o);
-                }
-                return null;
-            });
+        RemoveN(p, f, objects.Count);
     }
 }

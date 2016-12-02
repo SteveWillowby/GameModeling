@@ -87,10 +87,7 @@ public class EffectParser
             {
                 affector = o => {
                     Object o2 = WalkInChain(o[argIdx2], arg2);
-                    while(o2.Contains(line.tokens[2]))
-                    {
-                        o2.ThrowOut(o3 => o3.type == line.tokens[2]);
-                    }
+                    o2.ThrowOutAll(o3 => o3.type == line.tokens[2]);
                 };
             }
             else if(line.tokens.Length == 5)
@@ -98,10 +95,7 @@ public class EffectParser
                 affector = o => {
                     Object o2 = WalkInChain(o[argIdx2], arg2);
                     int numObjects = Int32.Parse(line.tokens[4]);
-                    for(int i = 0; i < numObjects; i++)
-                    {
-                        o2.ThrowOut(o3 => o3.type == line.tokens[2]);
-                    }
+                    o2.ThrowOutN(o3 => o3.type == line.tokens[2], numObjects);
                 };
             }
         }
@@ -111,8 +105,8 @@ public class EffectParser
                 GameState.AddObject(line.tokens[2]);
             };
         }
-        else if(type == Type.Delete)
-        {
+        else if(type == Type.Delete) //!!!When you delete, do you delete contained?!!!
+        {                            //!!!Currently not implemented that way       !!!
             string[] arg1 = line.tokens[2].Split(dot);
             int argIdx1 = ObjectIndex(header, arg1[0]);
             if(argIdx1 == -1)
@@ -127,10 +121,7 @@ public class EffectParser
                     o1._contains.ForEach(o2 => {
                         if(o2 != o1)
                         {
-                            while(o2.Contains(o3 => true) != null)
-                            {
-                                o2.ThrowOut(o3 => true);
-                            }
+                            o2.ThrowOutAll(o3 => true);
                         }
                         o1.ThrowOut(o2);
                         GameState.RemoveObject(o2);
@@ -141,10 +132,7 @@ public class EffectParser
             {
                 affector = o => {
                     Object o1 = WalkInChain(o[argIdx1], arg1);
-                    while(o1.Contains(o2 => true) != null)
-                    {
-                        o1.ThrowOut(o2 => true);
-                    }
+                    o1.ThrowOutAll(o2 => true);
                     GameState.RemoveObject(o1);
                 };
             }
