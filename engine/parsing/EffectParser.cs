@@ -67,9 +67,89 @@ public class EffectParser
         }
         else if(type == Type.Remove)
         {
+            string[] arg1 = line.tokens[2].Split(dot);
+            string[] arg2 = line.tokens[3].Split(dot);
+            int argIdx1 = ObjectIndex(header, arg1[0]);
+            int argIdx2 = ObjectIndex(header, arg2[0]);
+            if(argIdx2 == -1 && argIdx2 == -1)
+            {
+                throw new Exception("Remove requires an object");
+            }
+
+            if(argIdx1 != -1)
+            {
+                affector = o => {
+                    Object o1 = WalkInChain(o[argIdx1], arg1);
+                    o1._in.ThrowOut(o1);
+                };
+            }
+            else if(line.tokens.Length == 5 && line.tokens[4] == "all")
+            {
+                affector = o => {
+                    Object o2 = WalkInChain(o[argIdx2], arg2);
+                    while(o2.Contains(line.tokens[2]))
+                    {
+                        o2.ThrowOut(o3 => o3.type == line.tokens[2]);
+                    }
+                };
+            }
+            else if(line.tokens.Length == 5)
+            {
+                affector = o => {
+                    Object o2 = WalkInChain(o[argIdx2], arg2);
+                    int numObjects = Int32.Parse(line.tokens[4]);
+                    for(int i = 0; i < numObjects; i++)
+                    {
+                        o2.ThrowOut(o3 => o3.type == line.tokens[2]);
+                    }
+                };
+            }
+        }
+        else if(type == Type.Create)
+        {
+            affector = o => {
+                GameState.AddObject(line.tokens[2]);
+            };
         }
         else if(type == Type.Delete)
         {
+            string[] arg1 = line.tokens[2].Split(dot);
+            int argIdx1 = ObjectIndex(header, arg1[0]);
+            if(argIdx1 == -1)
+            {
+                throw new Exception("Remove requires an object");
+            }
+
+            if(arg1[arg1.Length - 1] == "contains")
+            {
+                affector = o => {
+                    Object o1 = WalkInChain(o[argIdx1], arg1);
+                    Object[] o1Contains = o1.ContainsAsArray();
+                    for(int i = 0; i < o1Contains.Length; i++)
+                    {
+                        if(o1Contains[i] != o1)
+                        {
+                            while(o1Contains[i].Contains(o2 => true) != null)
+                            {
+                                o1Contains[i].ThrowOut(o2 => true);
+                            }
+                        }
+                        o1.ThrowOut(o1Contains[i]);
+                        GameState.RemoveObject(o1Contains[i]);
+                    }
+                };
+            }
+            else
+            {
+                affector = o => {
+                    Object o1 = WalkInChain(o[argIdx1], arg1);
+                    while(o1.Contains(o2 => true) != null)
+                    {
+                        o1.ThrowOut(o2 => true);
+                    }
+                    GameState.RemoveObject(o1);
+                };
+            }
         }
         else if(type == Type.Distribute)
         {
@@ -82,6 +162,10 @@ public class EffectParser
         }
         else if(type == Type.SetTimer)
         {
+            affector = o => {
+                int seconds = Int32.Parse(line.tokens[2]);
+                Timer.SetTimer(seconds);
+            };
         }
 
         return new Effect(affector);

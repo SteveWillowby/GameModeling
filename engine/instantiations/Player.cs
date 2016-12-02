@@ -1,15 +1,26 @@
 using System;
 
-using ObjectList = System.Collections.Generic.LinkedList<Object>;
-using Objects = System.Collections.Generic.Dictionary<string, 
-        System.Collections.Generic.LinkedList<Object>>;
-
 public class Player
 {
-    protected Objects owns;
+    protected ObjectSet owns;
 
     public Player()
     {
-        owns = new Objects();
+        owns = new ObjectSet();
+    }
+
+    public void Own(Object o)
+    {
+        
+    }
+
+    public bool Owns(Object o)
+    {
+        return true;
+    }
+
+    public bool Disown(Object o)
+    {
+        return true;
     }
 }
