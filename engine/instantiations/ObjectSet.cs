@@ -62,8 +62,7 @@ public class ObjectSet
         ObjectListNode n = objects.First;
         ObjectListNode old;
         Object res;
-
-        while(n != objects.Last)
+        while(n != null)
         {
             old = n;
             n = n.Next;
