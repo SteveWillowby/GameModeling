@@ -35,11 +35,6 @@ public class Object //Class makes sure it's a reference type
         return _contains.Contains(p);
     }
 
-    public Object Contains(Func<Object, bool> p, string t)
-    {
-        return _contains.Contains(p, t);
-    }
-
     public Object RContains(Func<Object, bool> p)
     {
         return _contains.RContains(p);
@@ -118,11 +113,6 @@ public class Object //Class makes sure it's a reference type
     public bool RIn(string t)
     {
         return RIn((o => o.type == t)) != null;
-    }
-
-    public Object[] ContainsAsArray()
-    {
-        return _contains.ContainsAsArray();
     }
 
     ////////////////////////////////////////////////////////

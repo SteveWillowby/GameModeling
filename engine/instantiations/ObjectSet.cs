@@ -7,11 +7,11 @@ using Objects = System.Collections.Generic.Dictionary<string,
 
 public class ObjectSet
 {
-    Objects objects;
+    ObjectList objects;
 
     public ObjectSet()
     {
-        objects = new Dictionary<string, LinkedList<Object>>();
+        objects = new LinkedList<Object>();
     }
 
     ////////////////////////////////////////////////////////
@@ -22,40 +22,7 @@ public class ObjectSet
 
     public Object Contains(Func<Object, bool> p)
     {
-        Objects.Enumerator e = objects.GetEnumerator();
-        Object ans;
-        while(e.MoveNext())
-        {
-            ans = ListContains(e.Current.Value, p);
-            if(ans != null)
-            {
-                return ans;
-            }
-        }
-        return null;
-    }
-
-    public Object Contains(Func<Object, bool> p, string t)
-    {
-        ObjectList l;
-        if(!objects.TryGetValue(t, out l))
-        {
-            return null;
-        }
-        return ListContains(l, p);
-    }
-
-    protected static Object ListContains(ObjectList l, Func<Object, bool> p)
-    {
-        ObjectList.Enumerator e = l.GetEnumerator();
-        while(e.MoveNext())
-        {
-            if(p(e.Current))
-            {
-                return e.Current;
-            }
-        }
-        return null;
+        return ForEachUntil(p);
     }
 
     public Object RContains(Func<Object, bool> p)
@@ -74,52 +41,14 @@ public class ObjectSet
         {
             start = this;
         }
-
-        Objects.Enumerator e = objects.GetEnumerator();
-        ObjectList.Enumerator e2;
-        Object ans;
-        while(e.MoveNext())
-        {
-            e2 = e.Current.Value.GetEnumerator();
-            while(e2.MoveNext())
-            {
-                if(p(e2.Current))
+        return ForEachUntil(
+            o => {
+                if(p(o))
                 {
-                    return e2.Current;
+                    return o;
                 }
-
-                ans = e2.Current._contains.RContainsHelper(p, start);
-                if(ans != null)
-                {
-                    return ans;
-                }
-            }
-        }
-        return null;
-    }
-
-    public Object[] ContainsAsArray()
-    {
-        int totalSize = 0;
-        Objects.Enumerator e = objects.GetEnumerator();
-        while(e.MoveNext())
-        {
-            totalSize += e.Current.Value.Count;
-        }
-
-        Object[] ret = new Object[totalSize];
-        int idx = 0;
-        e = objects.GetEnumerator();
-        while(e.MoveNext())
-        {
-            ObjectList.Enumerator e2 = e.Current.Value.GetEnumerator();
-            while(e2.MoveNext())
-            {
-                ret[idx] = e2.Current;
-                idx++;
-            }
-        }
-        return ret;
+                return o._contains.RContainsHelper(p, start);
+            });
     }
 
     ////////////////////////////////////////////////////////
@@ -130,9 +59,7 @@ public class ObjectSet
 
     public Object ThrowOut(Object o)
     {
-        ObjectList l = objects[o.type];
-        l.Remove(o);
-        o._in = null;
+        objects.Remove(o);
         return o;
     }
 
@@ -149,12 +76,39 @@ public class ObjectSet
 
     public void TakeIn(Object o)
     {
-        ObjectList l;
-        if(!objects.TryGetValue(o.type, out l))
+        objects.AddFirst(o);
+    }
+
+    public Object ForEachUntil(Func<Object, Object> f)
+    {
+        ObjectList.Enumerator e = objects.GetEnumerator();
+        Object res;
+        while(e.MoveNext())
         {
-            l = new ObjectList();
-            objects.Add(o.type, l);
+            res = f(e.Current);
+            if(res != null)
+            {
+                return res;
+            }
         }
-        l.AddFirst(o);
+        return null;
+    }
+
+    public Object ForEachUntil(Func<Object, bool> f)
+    {
+        ObjectList.Enumerator e = objects.GetEnumerator();
+        while(e.MoveNext())
+        {
+            if(f(e.Current))
+            {
+                return e.Current;
+            }
+        }
+        return null;
+    }
+
+    public void ForEach(Action<Object> f)
+    {
+        ForEachUntil(o => {f(o); return true;});
     }
 }

@@ -124,19 +124,17 @@ public class EffectParser
             {
                 affector = o => {
                     Object o1 = WalkInChain(o[argIdx1], arg1);
-                    Object[] o1Contains = o1.ContainsAsArray();
-                    for(int i = 0; i < o1Contains.Length; i++)
-                    {
-                        if(o1Contains[i] != o1)
+                    o1._contains.ForEach(o2 => {
+                        if(o2 != o1)
                         {
-                            while(o1Contains[i].Contains(o2 => true) != null)
+                            while(o2.Contains(o3 => true) != null)
                             {
-                                o1Contains[i].ThrowOut(o2 => true);
+                                o2.ThrowOut(o3 => true);
                             }
                         }
-                        o1.ThrowOut(o1Contains[i]);
-                        GameState.RemoveObject(o1Contains[i]);
-                    }
+                        o1.ThrowOut(o2);
+                        GameState.RemoveObject(o2);
+                    });
                 };
             }
             else

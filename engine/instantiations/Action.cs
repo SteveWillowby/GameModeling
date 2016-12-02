@@ -1,9 +1,5 @@
 using System;
 
-using ObjectList = System.Collections.Generic.LinkedList<Object>;
-using Objects = System.Collections.Generic.Dictionary<string, 
-        System.Collections.Generic.LinkedList<Object>>;
-
 public class Action
 {
     protected int numObjects;

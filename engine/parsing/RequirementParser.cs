@@ -120,7 +120,7 @@ public class RequirementParser
                         Object o1 = WalkInChain(o[argIdx1], arg1);
                         Object o2 = WalkInChain(o[argIdx2], arg2);
                         return CheckForAll(o3 => o1.Contains(o3.type),
-                                            o2.ContainsAsArray());
+                                            o2._contains);
                     };
                 }
                 else if(argIdx2 != -1 && arg1[arg1.Length - 1] == "type")
@@ -137,7 +137,7 @@ public class RequirementParser
                         Object o1 = WalkInChain(o[argIdx1], arg1);
                         Object o2 = WalkInChain(o[argIdx2], arg2);
                         return CheckForAll(o3 => o1.Contains(o3),
-                                            o2.ContainsAsArray());
+                                            o2._contains);
                     };
                 }
                 else if(argIdx2 != -1)
@@ -165,7 +165,7 @@ public class RequirementParser
                         Object o1 = WalkInChain(o[argIdx1], arg1);
                         Object o2 = WalkInChain(o[argIdx2], arg2);
                         return CheckForAll(o3 => o1.RContains(o3.type),
-                                            o2.ContainsAsArray());
+                                            o2._contains);
                     };
                 }
                 else if(argIdx2 != -1 && arg1[arg1.Length - 1] == "type")
@@ -182,7 +182,7 @@ public class RequirementParser
                         Object o1 = WalkInChain(o[argIdx1], arg1);
                         Object o2 = WalkInChain(o[argIdx2], arg2);
                         return CheckForAll(o3 => o1.Contains(o3),
-                                            o2.ContainsAsArray());
+                                            o2._contains);
                     };
                 }
                 else if(argIdx2 != -1)
@@ -237,16 +237,9 @@ public class RequirementParser
         return -1;
     }
 
-    protected static bool CheckForAll(Func<Object, bool> p, Object[] o)
+    protected static bool CheckForAll(Func<Object, bool> p, ObjectSet o)
     {
-        for(int i = 0; i < o.Length; i++)
-        {
-            if(!p(o[i]))
-            {
-                return false;
-            }
-        }
-        return true;
+        return o.ForEachUntil(o1 => !p(o1)) == null;
     }
 
     protected static Object WalkInChain(Object o, string[] fullPath)
