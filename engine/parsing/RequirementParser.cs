@@ -21,14 +21,13 @@ public class RequirementParser
         int offset = negate ? 1 : 0;
 
         Func<Object[], bool> evaluator = o => true;
-        //int[] indices;
 
         string t = line.tokens[1 + offset];
         Type type = ParseType(t);
 
-        //indices = new int[0];
         if(type == Type.Owns)
         {
+            //###
         }
         else if(type == Type.Timer)
         {
@@ -45,19 +44,6 @@ public class RequirementParser
                 throw new Exception("In/Contains require an object");
             }
             int argIdx2 = ObjectIndex(header, arg2[0]);
-
-            /*
-            if(argIdx2 == -1)
-            {
-                indices = new int[1];
-            }
-            else
-            {
-                indices = new int[2];
-                indices[1] = argIdx2;
-            }
-            indices[0] = argIdx1;
-            */
 
             if(type == Type.In)
             {
@@ -203,9 +189,7 @@ public class RequirementParser
             }
         }
 
-        evaluator = o => negate ^ evaluator(o);
-
-        return new Requirement(evaluator);
+        return new Requirement(o => negate ^ evaluator(o));
     }
 
     protected static Type ParseType(string t)

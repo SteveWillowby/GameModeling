@@ -91,7 +91,7 @@ Action StartTimer StartTimerPhase p Container c
 #Question
 
 Action AskQuestion QuestionPhase p Container c Question q
-  require timer > 0
+  require timer
   require owns player q
   effect put q c
   effect disown q
@@ -141,7 +141,7 @@ Action DrawAntidote GetAntidotesPhase p Container c ActiveRoomHolder a Room r
   require in r a
   require contains r Object a'      #Here Object indicates "any type"
   effect delete a'
-  effect put Antidote c rand(0, 1)
+  effect put Antidote c rand(0,1)
 
 Action FinishDrawing GetAntidotesPhase p ActiveRoomHolder a Room r
   require in r a
