@@ -19,7 +19,7 @@ public class EffectParser
 
     public Effect Parse(Line header, Line line)
     {
-        Action<Object[]> affector = o => {};
+        Action<Object[], Player> affector = (o, p) => {};
 
         string t = line.tokens[1];
         Type type = ParseType(t);
@@ -37,7 +37,7 @@ public class EffectParser
 
             if(argIdx1 != -1)
             {
-                affector = o => {
+                affector = (o, p) => {
                     Object o1 = WalkInChain(o[argIdx1], arg1);
                     Object o2 = WalkInChain(o[argIdx2], arg2);
                     o2.TakeIn(o1);
@@ -45,7 +45,7 @@ public class EffectParser
             }
             else if(line.tokens.Length == 4)
             {
-                affector = o => {
+                affector = (o, p) => {
                     Object o2 = WalkInChain(o[argIdx2], arg2);
                     Object fresh = GameState.AddObject(arg1[0]);
                     o2.TakeIn(fresh);
@@ -53,7 +53,7 @@ public class EffectParser
             }
             else if(line.tokens.Length == 5)
             {
-                affector = o => {
+                affector = (o, p) => {
                     Object o2 = WalkInChain(o[argIdx2], arg2);
                     Object fresh;
                     int numObjects = Int32.Parse(line.tokens[4]);
@@ -78,35 +78,35 @@ public class EffectParser
 
             if(argIdx1 != -1)
             {
-                affector = o => {
+                affector = (o, p) => {
                     Object o1 = WalkInChain(o[argIdx1], arg1);
                     o1._in.ThrowOut(o1);
                 };
             }
             else if(line.tokens.Length == 5 && line.tokens[4] == "all")
             {
-                affector = o => {
+                affector = (o, p) => {
                     Object o2 = WalkInChain(o[argIdx2], arg2);
-                    o2.ThrowOutAll(o3 => o3.type == line.tokens[2]);
+                    o2.ThrowOutAll(Object.HasType(line.tokens[2]));
                 };
             }
             else if(line.tokens.Length == 5)
             {
-                affector = o => {
+                affector = (o, p) => {
                     Object o2 = WalkInChain(o[argIdx2], arg2);
                     int numObjects = Int32.Parse(line.tokens[4]);
-                    o2.ThrowOutN(o3 => o3.type == line.tokens[2], numObjects);
+                    o2.ThrowOutN(Object.HasType(line.tokens[2]), numObjects);
                 };
             }
         }
         else if(type == Type.Create)
         {
-            affector = o => {
+            affector = (o, p) => {
                 GameState.AddObject(line.tokens[2]);
             };
         }
-        else if(type == Type.Delete) //!!!When you delete, do you delete contained?!!!
-        {                            //!!!Currently not implemented that way       !!!
+        else if(type == Type.Delete)
+        {
             string[] arg1 = line.tokens[2].Split(dot);
             int argIdx1 = ObjectIndex(header, arg1[0]);
             if(argIdx1 == -1)
@@ -116,7 +116,7 @@ public class EffectParser
 
             if(arg1[arg1.Length - 1] == "contains")
             {
-                affector = o => {
+                affector = (o, p) => {
                     Object o1 = WalkInChain(o[argIdx1], arg1);
                     o1._contains.ForEach(o2 => {
                         if(o2 != o1)
@@ -130,7 +130,7 @@ public class EffectParser
             }
             else
             {
-                affector = o => {
+                affector = (o, p) => {
                     Object o1 = WalkInChain(o[argIdx1], arg1);
                     o1.ThrowOutAll(o2 => true);
                     GameState.RemoveObject(o1);
@@ -139,16 +139,18 @@ public class EffectParser
         }
         else if(type == Type.Distribute)
         {
+            
         }
         else if(type == Type.Disown)
         {
         }
         else if(type == Type.Players)
         {
+            affector = (o, p) => { PlayerState.Shift(line.tokens[2], p); };
         }
         else if(type == Type.SetTimer)
         {
-            affector = o => {
+            affector = (o, p) => {
                 int seconds = Int32.Parse(line.tokens[2]);
                 Timer.SetTimer(seconds);
             };

@@ -2,29 +2,20 @@ using System;
 
 public class Effect
 {
-    //protected int numObjects;
-    protected Action<Object[]> affector;
+    protected Action<Object[], Player> affector;
 
-    public void Affect(Object[] o)
+    public void Affect(Object[] o, Player p)
     {
-        /*
-        if(o.Length != numObjects)
-        {
-            return;
-        }
-        */
-        affector(o);
+        affector(o, p);
     }
 
     public Effect()
     {
-        //numObjects = 1;
-        affector = o => {};
+        affector = (o, p) => {};
     }
 
-    public Effect(Action<Object[]> a /*, int n*/)
+    public Effect(Action<Object[], Player> a)
     {
-        //numObjects = n;
         affector = a;
     }
 }

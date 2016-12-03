@@ -30,6 +30,15 @@ public class Object //Class makes sure it's a reference type
         return base.GetHashCode();
     }
 
+    public static Func<Object, bool> HasType(string t)
+    {
+        if(t == "Object") //Refers to any type
+        {
+            return o => true;
+        }
+        return o => o.type == t;
+    }
+
     public Object Contains(Func<Object, bool> p)
     {
         return _contains.Contains(p);
@@ -47,7 +56,7 @@ public class Object //Class makes sure it's a reference type
 
     public bool Contains(string t)
     {
-        return Contains((o => o.type == t)) != null;
+        return Contains(HasType(t)) != null;
     }
 
     public bool RContains(Object o)
@@ -57,7 +66,7 @@ public class Object //Class makes sure it's a reference type
 
     public bool RContains(string t)
     {
-        return RContains((o => o.type == t)) != null;
+        return RContains(HasType(t)) != null;
     }
 
     public Object In(Func<Object, bool> p)
@@ -76,7 +85,7 @@ public class Object //Class makes sure it's a reference type
 
     public bool In(string t)
     {
-        return In((o => o.type == t)) != null;
+        return In(HasType(t)) != null;
     }
 
     public Object RIn(Func<Object, bool> p)
@@ -112,7 +121,7 @@ public class Object //Class makes sure it's a reference type
 
     public bool RIn(string t)
     {
-        return RIn(o => o.type == t) != null;
+        return RIn(HasType(t)) != null;
     }
 
     ////////////////////////////////////////////////////////

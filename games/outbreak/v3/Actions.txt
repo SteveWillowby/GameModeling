@@ -23,10 +23,10 @@ Action Move Track t Container c MovePhase p
 #UseTokens
 
 Action SpendToken Marker m Container c UseTokensPhase p
-  require not in m.in null #Can this sort of check be automated?
+  require not in m.in null
   require contains c Token
   effect put m m.in
-  effect remove Token c 1 #How to best format this?
+  effect remove Token c 1
 
 Action Transition Container c UseTokensPhase p
   require not contains c Token
@@ -106,7 +106,7 @@ Action FinishQuestioning QuestionPhase p
 
 Action SendAsset RoomPhase p MissionSlots m Asset a
   require owns a
-  require contains m Asset < 3      #m contains fewer than three Assets
+  require contains m Asset < 3  #m contains fewer than three Assets
   effect put a m
 
 Action RecallAsset RoomPhase p MissionSlots m Asset a
@@ -122,7 +122,7 @@ Action LockInAssets RoomPhase p
 
 Action Succeed ResolvePhase p ActiveRoomHolder a Room r MissionSlots m
   require in r a
-  require rcontains m r.contains.type            #checking for multiple objects
+  require rcontains m r.contains.type    #checking for multiple objects
   effect delete p
   effect create GetAntidotesPhase
 
@@ -130,17 +130,17 @@ Action Fail ResolvePhase p ActiveRoomHolder a Room r MissionSlots m
   require in r a
   require not rcontains m r.contains.type
   effect delete r
-  effect delete a.contains     #Delete all assets in a
+  effect delete a.contains   #Delete all assets in a
   effect delete p
   effect create RefillAssetsPhase
 
 
 #GetAntidotes
 
-Action DrawAntidote GetAntidotesPhase p Container c ActiveRoomHolder a Room r
+Action DrawAntidote GetAntidotesPhase p Container c ActiveRoomHolder a Room r Object a'
   require in r a
-  require contains r Object a'      #Here Object indicates "any type"
-  effect delete a'
+  require contains r a   #Here Object indicates "any type"
+  effect delete a
   effect put Antidote c rand(0,1)
 
 Action FinishDrawing GetAntidotesPhase p ActiveRoomHolder a Room r

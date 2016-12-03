@@ -168,4 +168,11 @@ public class ObjectSet
         ForEach(o => { if(p(o)) { s.Add(o); } });
         return s;
     }
+
+    public int Count(Func<Object, bool> p)
+    {
+        int count = 0;
+        ForEach(o => { if(p(o)) { count++; } });
+        return count;
+    }
 }

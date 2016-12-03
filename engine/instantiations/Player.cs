@@ -9,6 +9,16 @@ public class Player
         owns = new ObjectSet();
     }
 
+    public override bool Equals(System.Object o)
+    {
+        return o != null && Object.ReferenceEquals(this, o);
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
+
     public void Own(Object o)
     {
         owns.Add(o);
@@ -21,19 +31,17 @@ public class Player
 
     public bool Owns(string t)
     {
-        return owns.Contains(o => o.type == t) != null;
+        return owns.Contains(Object.HasType(t)) != null;
     }
 
     public bool OwnsLess(string t, int n)
     {
-        ObjectSet s = owns.Subset(o => o.type == t);
-        return s.Size() < n;
+        return owns.Count(Object.HasType(t)) < n;
     }
 
     public bool OwnsMore(string t, int n)
     {
-        ObjectSet s = owns.Subset(o => o.type == t);
-        return s.Size() > n;
+        return owns.Count(Object.HasType(t)) > n;
     }
 
     public void Disown(Object o)
