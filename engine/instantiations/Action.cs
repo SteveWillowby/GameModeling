@@ -6,11 +6,11 @@ public class Action
     protected Requirement[] requirements;
     protected Effect[] effects;
 
-    protected bool RequirementsMet(Object[] o)
+    protected bool RequirementsMet(Object[] o, Player p)
     {
         for(int i = 0; i < requirements.Length; i++)
         {
-            if(!requirements[i].Met(o))
+            if(!requirements[i].Met(o, p))
             {
                 return false;
             }

@@ -15,6 +15,6 @@ public class GameState
     //Assumes o is in all
     public static void RemoveObject(Object o)
     {
-        all.RemoveFirst(o2 => o == o2, o2 => {});
+        all.RemoveFirst(o.Equals, o2 => {});
     }
 }

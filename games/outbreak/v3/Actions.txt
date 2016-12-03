@@ -1,7 +1,7 @@
 #Init
 
 Action DrawAssets InitPhase p Container c
-  require owns player Asset < 3
+  require owns Asset < 3
   effect distribute c player Asset 1
 
 Action EndDrawing InitPhase p
@@ -92,7 +92,7 @@ Action StartTimer StartTimerPhase p Container c
 
 Action AskQuestion QuestionPhase p Container c Question q
   require timer
-  require owns player q
+  require owns q
   effect put q c
   effect disown q
 
@@ -105,7 +105,7 @@ Action FinishQuestioning QuestionPhase p
 #Room
 
 Action SendAsset RoomPhase p MissionSlots m Asset a
-  require owns player a
+  require owns a
   require contains m Asset < 3      #m contains fewer than three Assets
   effect put a m
 
@@ -155,7 +155,7 @@ Action FinishDrawing GetAntidotesPhase p ActiveRoomHolder a Room r
 #RefillAssets
 
 Action RefillAssets RefillAssetsPhase p Container c
-  require owns player Asset < 3
+  require owns Asset < 3
   effect distribute c player Asset 1
 
 Action EndRefill RefillAssetsPhase p

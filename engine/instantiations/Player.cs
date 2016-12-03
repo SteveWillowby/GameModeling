@@ -11,16 +11,33 @@ public class Player
 
     public void Own(Object o)
     {
-        
+        owns.Add(o);
     }
 
     public bool Owns(Object o)
     {
-        return true;
+        return owns.Contains(o.Equals) != null;
     }
 
-    public bool Disown(Object o)
+    public bool Owns(string t)
     {
-        return true;
+        return owns.Contains(o => o.type == t) != null;
+    }
+
+    public bool OwnsLess(string t, int n)
+    {
+        ObjectSet s = owns.Subset(o => o.type == t);
+        return s.Size() < n;
+    }
+
+    public bool OwnsMore(string t, int n)
+    {
+        ObjectSet s = owns.Subset(o => o.type == t);
+        return s.Size() > n;
+    }
+
+    public void Disown(Object o)
+    {
+        owns.RemoveFirst(o.Equals, a => {});
     }
 }

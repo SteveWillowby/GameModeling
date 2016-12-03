@@ -2,21 +2,16 @@ using System;
 
 public class Requirement
 {
-    protected Func<Object[], bool> evaluator;
+    protected Func<Object[], Player, bool> evaluator;
 
-    public bool Met(Object[] o)
+    public bool Met(Object[] o, Player p)
     {
-        return evaluator(o);
+        return evaluator(o, p);
     }
 
     public Requirement() {}
 
-    public Requirement(Func<Object[], bool> e)
-    {
-        SetEvaluator(e);
-    }
-
-    protected void SetEvaluator(Func<Object[], bool> e)
+    public Requirement(Func<Object[], Player, bool> e)
     {
         evaluator = e;
     }

@@ -13,6 +13,11 @@ public class ObjectSet
         objects = new LinkedList<Object>();
     }
 
+    public int Size()
+    {
+        return objects.Count;
+    }
+
     ////////////////////////////////////////////////////////
     //                                                    //
     //                   Begin Checkers                   //
@@ -26,28 +31,7 @@ public class ObjectSet
 
     public Object RContains(Func<Object, bool> p)
     {
-        return RContainsHelper(p, this);
-    }
-
-    //Currently a DFS
-    public Object RContainsHelper(Func<Object, bool> p, ObjectSet start)
-    {
-        if(this == start)
-        {
-            return null;
-        }
-        if(!(start != null))
-        {
-            start = this;
-        }
-        return ForEachUntil(
-            o => {
-                if(p(o))
-                {
-                    return o;
-                }
-                return o._contains.RContainsHelper(p, start);
-            });
+        return RForEachUntil(p);
     }
 
     ////////////////////////////////////////////////////////
@@ -97,6 +81,51 @@ public class ObjectSet
         ForEachUntil(o => {f(o); return null;});
     }
 
+    protected Object RForEachUntil(Func<ObjectListNode, Object> f)
+    {
+        return RForEachUntilHelper(f, null);
+    }
+
+    //Currently a DFS
+    //Considering the structure as a tree, this operates on leaf nodes first
+    public Object RForEachUntilHelper(Func<ObjectListNode, Object> f, 
+                                         ObjectSet start)
+    {
+        if(this == start)
+        {
+            return null;
+        }
+        if(!(start != null))
+        {
+            start = this;
+        }
+        return ForEachUntil(
+            n => {
+                Object ret = n.Value._contains.RForEachUntilHelper(f, start);
+                if(ret != null)
+                {
+                    return ret;
+                }
+                return f(n);
+            });
+    }
+
+    public Object RForEachUntil(Func<Object, Object> f)
+    {
+        return RForEachUntil(n => f(n.Value));
+    }
+
+    public Object RForEachUntil(Func<Object, bool> f)
+    {
+        return RForEachUntil(n => {
+                if (f(n.Value))
+                {
+                    return n.Value;
+                } 
+                return null;
+            });
+    }
+
     public void Add(Object o)
     {
         objects.AddFirst(o);
@@ -131,5 +160,12 @@ public class ObjectSet
     public void RemoveAll(Func<Object, bool> p, Action<Object> f)
     {
         RemoveN(p, f, objects.Count);
+    }
+
+    public ObjectSet Subset(Func<Object, bool> p)
+    {
+        ObjectSet s = new ObjectSet();
+        ForEach(o => { if(p(o)) { s.Add(o); } });
+        return s;
     }
 }

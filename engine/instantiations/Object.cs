@@ -128,7 +128,7 @@ public class Object //Class makes sure it's a reference type
 
     public Object ThrowOut(Object o)
     {
-        return _contains.RemoveFirst(o2 => o2 == o, NullifyIn);
+        return _contains.RemoveFirst(o.Equals, NullifyIn);
     }
 
     public Object ThrowOut(Func<Object, bool> p)
@@ -138,7 +138,7 @@ public class Object //Class makes sure it's a reference type
 
     public Object ThrowOutN(Object o, int N)
     {
-        return _contains.RemoveN(o2 => o2 == o, NullifyIn, N);
+        return _contains.RemoveN(o.Equals, NullifyIn, N);
     }
 
     public Object ThrowOutN(Func<Object, bool> p, int N)

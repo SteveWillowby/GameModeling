@@ -20,18 +20,46 @@ public class RequirementParser
         bool negate = line.tokens[1] == "not";
         int offset = negate ? 1 : 0;
 
-        Func<Object[], bool> evaluator = o => true;
+        Func<Object[], Player, bool> evaluator = (o, p) => true;
 
         string t = line.tokens[1 + offset];
         Type type = ParseType(t);
 
         if(type == Type.Owns)
         {
-            //###
+            string[] arg1 = line.tokens[2 + offset].Split(dot);
+            int argIdx1 = ObjectIndex(header, arg1[0]);
+            if(argIdx1 != -1)
+            {
+                evaluator = (o, p) => {
+                    Object o1 = WalkInChain(o[argIdx1], arg1);
+                    return p.Owns(o1);
+                };
+            }
+            else if(line.tokens.Length == 3 + offset)
+            {
+                evaluator = (o, p) => {
+                    return p.Owns(line.tokens[2 + offset]);
+                };
+            }
+            else if(line.tokens[3 + offset] == "<")
+            {
+                evaluator = (o, p) => {
+                    int numObjects = Int32.Parse(line.tokens[4 + offset]);
+                    return p.OwnsLess(line.tokens[2 + offset], numObjects);
+                };
+            }
+            else if(line.tokens[3 + offset] == ">")
+            {
+                evaluator = (o, p) => {
+                    int numObjects = Int32.Parse(line.tokens[4 + offset]);
+                    return p.OwnsMore(line.tokens[2 + offset], numObjects);
+                };
+            }
         }
         else if(type == Type.Timer)
         {
-            evaluator = o => Timer.TimeOnTheClock();
+            evaluator = (o, p) => Timer.TimeOnTheClock();
         }
         else if(type == Type.In || type == Type.RIn ||
                 type == Type.Contains || type == Type.RContains)
@@ -49,7 +77,7 @@ public class RequirementParser
             {
                 if(argIdx2 != -1 && arg1[arg1.Length - 1] == "type")
                 {
-                    evaluator = o => {
+                    evaluator = (o, p) => {
                         Object o1 = WalkInChain(o[argIdx1], arg1);
                         Object o2 = WalkInChain(o[argIdx2], arg2);
                         return o1.In(o2.type);
@@ -57,7 +85,7 @@ public class RequirementParser
                 }
                 else if(argIdx2 != -1)
                 {
-                    evaluator = o => {
+                    evaluator = (o, p) => {
                         Object o1 = WalkInChain(o[argIdx1], arg1);
                         Object o2 = WalkInChain(o[argIdx2], arg2);
                         return o1.In(o2);
@@ -65,7 +93,7 @@ public class RequirementParser
                 }
                 else
                 {
-                    evaluator = o => {
+                    evaluator = (o, p) => {
                         Object o1 = WalkInChain(o[argIdx1], arg1);
                         return o1.In(arg2[0]);
                     };
@@ -75,7 +103,7 @@ public class RequirementParser
             {
                 if(argIdx2 != -1 && arg1[arg1.Length - 1] == "type")
                 {
-                    evaluator = o => {
+                    evaluator = (o, p) => {
                         Object o1 = WalkInChain(o[argIdx1], arg1);
                         Object o2 = WalkInChain(o[argIdx2], arg2);
                         return o1.RIn(o2.type);
@@ -83,7 +111,7 @@ public class RequirementParser
                 }
                 else if(argIdx2 != -1)
                 {
-                    evaluator = o => {
+                    evaluator = (o, p) => {
                         Object o1 = WalkInChain(o[argIdx1], arg1);
                         Object o2 = WalkInChain(o[argIdx2], arg2);
                         return o1.RIn(o2);
@@ -91,7 +119,7 @@ public class RequirementParser
                 }
                 else
                 {
-                    evaluator = o => {
+                    evaluator = (o, p) => {
                         Object o1 = WalkInChain(o[argIdx1], arg1);
                         return o1.RIn(arg2[0]);
                     };
@@ -102,7 +130,7 @@ public class RequirementParser
                 if(argIdx2 != -1 && arg1[arg1.Length - 1] == "type" &&
                     arg1.Length > 1 && arg1[arg1.Length - 2] == "contains")
                 {
-                    evaluator = o => {
+                    evaluator = (o, p) => {
                         Object o1 = WalkInChain(o[argIdx1], arg1);
                         Object o2 = WalkInChain(o[argIdx2], arg2);
                         return CheckForAll(o3 => o1.Contains(o3.type),
@@ -111,7 +139,7 @@ public class RequirementParser
                 }
                 else if(argIdx2 != -1 && arg1[arg1.Length - 1] == "type")
                 {
-                    evaluator = o => {
+                    evaluator = (o, p) => {
                         Object o1 = WalkInChain(o[argIdx1], arg1);
                         Object o2 = WalkInChain(o[argIdx2], arg2);
                         return o1.Contains(o2.type);
@@ -119,7 +147,7 @@ public class RequirementParser
                 }
                 else if(argIdx2 != -1 && arg1[arg1.Length - 1] == "contains")
                 {
-                    evaluator = o => {
+                    evaluator = (o, p) => {
                         Object o1 = WalkInChain(o[argIdx1], arg1);
                         Object o2 = WalkInChain(o[argIdx2], arg2);
                         return CheckForAll(o3 => o1.Contains(o3),
@@ -128,7 +156,7 @@ public class RequirementParser
                 }
                 else if(argIdx2 != -1)
                 {
-                    evaluator = o => {
+                    evaluator = (o, p) => {
                         Object o1 = WalkInChain(o[argIdx1], arg1);
                         Object o2 = WalkInChain(o[argIdx2], arg2);
                         return o1.Contains(o2);
@@ -136,7 +164,7 @@ public class RequirementParser
                 }
                 else
                 {
-                    evaluator = o => {
+                    evaluator = (o, p) => {
                         Object o1 = WalkInChain(o[argIdx1], arg1);
                         return o1.Contains(arg2[0]);
                     };
@@ -147,7 +175,7 @@ public class RequirementParser
                 if(argIdx2 != -1 && arg1[arg1.Length - 1] == "type" &&
                     arg1.Length > 1 && arg1[arg1.Length - 2] == "contains")
                 {
-                    evaluator = o => {
+                    evaluator = (o, p) => {
                         Object o1 = WalkInChain(o[argIdx1], arg1);
                         Object o2 = WalkInChain(o[argIdx2], arg2);
                         return CheckForAll(o3 => o1.RContains(o3.type),
@@ -156,7 +184,7 @@ public class RequirementParser
                 }
                 else if(argIdx2 != -1 && arg1[arg1.Length - 1] == "type")
                 {
-                    evaluator = o => {
+                    evaluator = (o, p) => {
                         Object o1 = WalkInChain(o[argIdx1], arg1);
                         Object o2 = WalkInChain(o[argIdx2], arg2);
                         return o1.RContains(o2.type);
@@ -164,7 +192,7 @@ public class RequirementParser
                 }
                 else if(argIdx2 != -1 && arg1[arg1.Length - 1] == "contains")
                 {
-                    evaluator = o => {
+                    evaluator = (o, p) => {
                         Object o1 = WalkInChain(o[argIdx1], arg1);
                         Object o2 = WalkInChain(o[argIdx2], arg2);
                         return CheckForAll(o3 => o1.Contains(o3),
@@ -173,7 +201,7 @@ public class RequirementParser
                 }
                 else if(argIdx2 != -1)
                 {
-                    evaluator = o => {
+                    evaluator = (o, p) => {
                         Object o1 = WalkInChain(o[argIdx1], arg1);
                         Object o2 = WalkInChain(o[argIdx2], arg2);
                         return o1.RContains(o2);
@@ -181,7 +209,7 @@ public class RequirementParser
                 }
                 else
                 {
-                    evaluator = o => {
+                    evaluator = (o, p) => {
                         Object o1 = WalkInChain(o[argIdx1], arg1);
                         return o1.RContains(arg2[0]);
                     };
@@ -189,7 +217,7 @@ public class RequirementParser
             }
         }
 
-        return new Requirement(o => negate ^ evaluator(o));
+        return new Requirement((o, p) => negate ^ evaluator(o, p));
     }
 
     protected static Type ParseType(string t)
