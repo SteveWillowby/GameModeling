@@ -1,5 +1,16 @@
-/* This class simply a group of lines */
 using System;
+
+/* This class simply stores lines as a header and subsequent lines
+ *
+ * The intuition here is that something like:
+ *
+ * "Action MyAction Thing one Thing two
+ *   requirement .......
+ *   effect ......
+ *   effect ......"
+ *
+ * falls nicely into the header-lines scheme.
+ */
 
 public class Chunk
 {

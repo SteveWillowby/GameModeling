@@ -1,5 +1,9 @@
 using System;
 
+/* This class needs more work.
+ * It primarily serves as a container for requirements and effects.
+ */
+
 public class Action
 {
     protected int numObjects;

@@ -1,10 +1,16 @@
 using System.Collections.Generic;
 using System;
 
+/* An Object is the basic unit of this model and engine.
+ * Almost everything revolves around objects.
+ */
+
 public class Object //Class makes sure it's a reference type
 {
+    //These could probably be made protected rather than public in the future.
+    //It might take a bit of work.
     public string type;
-    public Object _in; //"in" is taken
+    public Object _in; //"in" is reserved, hence the name "_in"
     public ObjectSet _contains;
 
     public Object(string t)
@@ -17,14 +23,17 @@ public class Object //Class makes sure it's a reference type
     ////////////////////////////////////////////////////////
     //                                                    //
     //                   Begin Checkers                   //
+    //              (aka querying functions)              //
     //                                                    //
     ////////////////////////////////////////////////////////
 
+    //Allows you to use == to see if the objects are the same
     public override bool Equals(System.Object o)
     {
         return o != null && Object.ReferenceEquals(this, o);
     }
 
+    //Needs to be here in conjunction with overriding Equals()
     public override int GetHashCode()
     {
         return base.GetHashCode();
@@ -39,6 +48,7 @@ public class Object //Class makes sure it's a reference type
         return o => o.type == t;
     }
 
+    //These are simply wrappers
     public Object Contains(Func<Object, bool> p)
     {
         return _contains.Contains(p);
@@ -71,7 +81,7 @@ public class Object //Class makes sure it's a reference type
 
     public Object In(Func<Object, bool> p)
     {
-        if(p(_in))
+        if(_in != null && p(_in))
         {
             return _in;
         }
@@ -97,6 +107,13 @@ public class Object //Class makes sure it's a reference type
         return _in.RInHelper(p, this, false);
     }
 
+    /* This function might seem strange at first glance.
+     * It uses the tortoise-hare method to avoid getting stuck in
+     * an infinite loop ("Floyd's cycle-finding algorithm").
+     * 
+     * If any object up the _in-chain satisfies p, that object is returned.
+     * Otherwise, the function returns null.
+     */
     protected Object RInHelper(Func<Object, bool> p, Object tortoise, bool step)
     {
         if(p(this))
@@ -130,11 +147,14 @@ public class Object //Class makes sure it's a reference type
     //                                                    //
     ////////////////////////////////////////////////////////
 
+    //Used when removing an object to "tell" that object
+    //it's no longer inside another object
     protected void NullifyIn(Object o)
     {
         o._in = null;
     }
 
+    //A bunch of wrapper functions
     public Object ThrowOut(Object o)
     {
         return _contains.RemoveFirst(o.Equals, NullifyIn);
@@ -160,10 +180,13 @@ public class Object //Class makes sure it's a reference type
         _contains.RemoveAll(p, NullifyIn);
     }
 
+    //Adds an object to contains
     public void TakeIn(Object o)
     {
         if(o._in != null)
         {
+            //Before adding an object, remove it from one it's
+            //already in
             o._in.ThrowOut(o.Equals);
         }
         _contains.Add(o);

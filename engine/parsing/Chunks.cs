@@ -6,6 +6,7 @@ public class Chunks
 
     public Chunks(File f)
     {
+        //First count the number of chunks so we can allocate the array
         int numChunks = 0;
         for(int i = 0; i < f.lines.Length; i++)
         {

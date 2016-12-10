@@ -1,5 +1,8 @@
-/*  */
 using System;
+
+/* A container for lines that can populate those lines with the
+ * contents of a file.
+ */
 
 public class File
 {
@@ -7,12 +10,9 @@ public class File
 
     public File(string filename)
     {
-        //Open File
-        //Fill Lines, Skipping Blank Ones
-
         System.IO.StreamReader file = new System.IO.StreamReader(filename);
         string line;
-        int count = 0;
+        int count = 0; //First just count the number of non-blank lines.
         while((line = file.ReadLine()) != null)
         {
             if(!String.IsNullOrWhiteSpace(line))
@@ -21,10 +21,10 @@ public class File
             }
         }
 
-        lines = new Line[count];
+        lines = new Line[count]; //Then allocate space for them
         file = new System.IO.StreamReader(filename);
         count = 0;
-        while((line = file.ReadLine()) != null)
+        while((line = file.ReadLine()) != null) //and fill them
         {
             if(!String.IsNullOrWhiteSpace(line))
             {

@@ -1,5 +1,12 @@
-/* Parses a requirement line */
 using System;
+
+/* This class provides the Parse() method that takes
+ * a header and a regular line, creating an Effect.
+ *
+ * This class could really stand to have more
+ * checks for malformed input and throw errors when such 
+ * input occurs.
+ */
 
 public class EffectParser
 {
@@ -15,46 +22,60 @@ public class EffectParser
         , SetTimer
     };
 
+    /* Used for the Split function to, for example, convert
+     * "a.in.in.contains" into ["a", "in", "in", "contains"]
+     */
     protected static char[] dot = {'.'};
 
-    public Effect Parse(Line header, Line line)
+    /* This function has a lot of "Magic Constants." To understand them
+     * you really should know the model as defined in the documentation.
+     */
+    public static Effect Parse(Line header, Line line)
     {
         Action<Object[], Player> affector = (o, p) => {};
 
         string t = line.tokens[1];
         Type type = ParseType(t);
 
+        /* Since the object array passed into our affector() will include
+         * all the objects the Action deals with, not every one will be
+         * used in a given Effect. Thus, for a specific effect, we need to
+         * determine the indices of the array it should use.
+         *
+         * This is done with the "argIdx_ = ActionParser.ObjectIndex..."
+         * statements.
+         */
         if(type == Type.Put)
         {
             string[] arg1 = line.tokens[2].Split(dot);
             string[] arg2 = line.tokens[3].Split(dot);
-            int argIdx1 = ObjectIndex(header, arg1[0]);
-            int argIdx2 = ObjectIndex(header, arg2[0]);
+            int argIdx1 = ActionParser.ObjectIndex(header, arg1[0]);
+            int argIdx2 = ActionParser.ObjectIndex(header, arg2[0]);
             if(argIdx2 == -1)
             {
                 throw new Exception("Put requires an object");
             }
 
-            if(argIdx1 != -1)
+            if(argIdx1 != -1) //effect put obj1 obj2
             {
                 affector = (o, p) => {
-                    Object o1 = WalkInChain(o[argIdx1], arg1);
-                    Object o2 = WalkInChain(o[argIdx2], arg2);
+                    Object o1 = ActionParser.WalkInChain(o[argIdx1], arg1);
+                    Object o2 = ActionParser.WalkInChain(o[argIdx2], arg2);
                     o2.TakeIn(o1);
                 };
             }
-            else if(line.tokens.Length == 4)
+            else if(line.tokens.Length == 4) //effect put type obj
             {
                 affector = (o, p) => {
-                    Object o2 = WalkInChain(o[argIdx2], arg2);
+                    Object o2 = ActionParser.WalkInChain(o[argIdx2], arg2);
                     Object fresh = GameState.AddObject(arg1[0]);
                     o2.TakeIn(fresh);
                 };
             }
-            else if(line.tokens.Length == 5)
+            else if(line.tokens.Length == 5) //effect put type obj num
             {
                 affector = (o, p) => {
-                    Object o2 = WalkInChain(o[argIdx2], arg2);
+                    Object o2 = ActionParser.WalkInChain(o[argIdx2], arg2);
                     Object fresh;
                     int numObjects = Int32.Parse(line.tokens[4]);
                     for(int i = 0; i < numObjects; i++)
@@ -67,39 +88,47 @@ public class EffectParser
         }
         else if(type == Type.Remove)
         {
-            string[] arg1 = line.tokens[2].Split(dot);
-            string[] arg2 = line.tokens[3].Split(dot);
-            int argIdx1 = ObjectIndex(header, arg1[0]);
-            int argIdx2 = ObjectIndex(header, arg2[0]);
-            if(argIdx2 == -1 && argIdx2 == -1)
+            if(line.tokens.Length == 3) //effect remove obj
             {
-                throw new Exception("Remove requires an object");
-            }
-
-            if(argIdx1 != -1)
-            {
+                string[] arg1 = line.tokens[2].Split(dot);
+                int argIdx1 = ActionParser.ObjectIndex(header, arg1[0]);
+                if(argIdx1 == -1)
+                {
+                    throw new Exception("Remove requires an object");
+                }
+                
                 affector = (o, p) => {
-                    Object o1 = WalkInChain(o[argIdx1], arg1);
+                    Object o1 = ActionParser.WalkInChain(o[argIdx1], arg1);
                     o1._in.ThrowOut(o1);
-                };
-            }
-            else if(line.tokens.Length == 5 && line.tokens[4] == "all")
-            {
-                affector = (o, p) => {
-                    Object o2 = WalkInChain(o[argIdx2], arg2);
-                    o2.ThrowOutAll(Object.HasType(line.tokens[2]));
                 };
             }
             else if(line.tokens.Length == 5)
             {
-                affector = (o, p) => {
-                    Object o2 = WalkInChain(o[argIdx2], arg2);
-                    int numObjects = Int32.Parse(line.tokens[4]);
-                    o2.ThrowOutN(Object.HasType(line.tokens[2]), numObjects);
-                };
+                string[] arg2 = line.tokens[3].Split(dot);
+                int argIdx2 = ActionParser.ObjectIndex(header, arg2[0]);
+                if(argIdx2 == -1)
+                {
+                    throw new Exception("Remove requires an object");
+                }
+
+                if(line.tokens[4] == "all") //effect remove type obj all
+                {
+                    affector = (o, p) => {
+                        Object o2 = ActionParser.WalkInChain(o[argIdx2], arg2);
+                        o2.ThrowOutAll(Object.HasType(line.tokens[2]));
+                    };
+                }
+                else //effect remove type obj num
+                {
+                    affector = (o, p) => {
+                        Object o2 = ActionParser.WalkInChain(o[argIdx2], arg2);
+                        int numObjects = Int32.Parse(line.tokens[4]);
+                        o2.ThrowOutN(Object.HasType(line.tokens[2]), numObjects);
+                    };
+                }
             }
         }
-        else if(type == Type.Create)
+        else if(type == Type.Create) //effect create type
         {
             affector = (o, p) => {
                 GameState.AddObject(line.tokens[2]);
@@ -108,30 +137,31 @@ public class EffectParser
         else if(type == Type.Delete)
         {
             string[] arg1 = line.tokens[2].Split(dot);
-            int argIdx1 = ObjectIndex(header, arg1[0]);
+            int argIdx1 = ActionParser.ObjectIndex(header, arg1[0]);
             if(argIdx1 == -1)
             {
                 throw new Exception("Remove requires an object");
             }
 
-            if(arg1[arg1.Length - 1] == "contains")
+            if(arg1[arg1.Length - 1] == "contains") //effect delete obj.contains
             {
                 affector = (o, p) => {
-                    Object o1 = WalkInChain(o[argIdx1], arg1);
-                    o1._contains.ForEach(o2 => {
+                    Object o1 = ActionParser.WalkInChain(o[argIdx1], arg1);
+                    o1._contains.RemoveAll(o2 => true, o2 => {
+                        //Once it's removed throw out everything it contains...
                         if(o2 != o1)
                         {
                             o2.ThrowOutAll(o3 => true);
                         }
-                        o1.ThrowOut(o2);
+                        //...and remove it from the game state
                         GameState.RemoveObject(o2);
                     });
                 };
             }
-            else
+            else //effect delete obj
             {
                 affector = (o, p) => {
-                    Object o1 = WalkInChain(o[argIdx1], arg1);
+                    Object o1 = ActionParser.WalkInChain(o[argIdx1], arg1);
                     o1.ThrowOutAll(o2 => true);
                     GameState.RemoveObject(o1);
                 };
@@ -139,16 +169,17 @@ public class EffectParser
         }
         else if(type == Type.Distribute)
         {
-            
+            //Implement this
         }
         else if(type == Type.Disown)
         {
+            //Implement this
         }
-        else if(type == Type.Players)
+        else if(type == Type.Players) //effect players shiftType
         {
             affector = (o, p) => { PlayerState.Shift(line.tokens[2], p); };
         }
-        else if(type == Type.SetTimer)
+        else if(type == Type.SetTimer) //effect settimer num
         {
             affector = (o, p) => {
                 int seconds = Int32.Parse(line.tokens[2]);
@@ -182,31 +213,5 @@ public class EffectParser
             default:
                 throw new Exception("Invalid requirement type " + t);
         }
-    }
-
-    //Note that this code is duplicated in RequirementParser.
-    //Perhaps this should be moved to Action?
-    protected static int ObjectIndex(Line header, string o)
-    {
-        for(int i = 3; i < header.tokens.Length; i += 2)
-        {
-            if(header.tokens[i] == o)
-            {
-                return (i - 3) / 2;
-            }
-        }
-        return -1;
-    }
-
-    //This method is duplicated in RequirementParser
-    protected static Object WalkInChain(Object o, string[] fullPath)
-    {
-        //fullPath[0] is the object's name
-        int i;
-        for(i = 1; i < fullPath.Length && fullPath[i] == "in"; i++)
-        {
-            o = o._in; //could be null!
-        }
-        return o;
     }
 }

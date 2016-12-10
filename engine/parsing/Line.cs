@@ -1,5 +1,6 @@
-/* This class represents a line in a parsed file */
 using System;
+
+/* This class represents a line in a parsed file. */
 
 public class Line
 {
@@ -16,7 +17,7 @@ public class Line
 
         string[] s = l.Split(delimiters);
 
-        //This loop is for removing whitespace
+        //Count the number of non-empty strings
         int numTokens = 0;
         for(int i = 0; i < s.Length; i++)
         {
@@ -26,12 +27,15 @@ public class Line
             }
         }
 
+        //Then save those in the tokens array
+        int token = 0;
         tokens = new string[numTokens];
-        for(int i = 0; i < numTokens; i++)
+        for(int i = 0; i < s.Length; i++)
         {
             if(s[i].Length > 0)
             {
-                tokens[i] = s[i];
+                tokens[token] = s[i];
+                token++;
             }
         }
     }
