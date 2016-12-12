@@ -27,7 +27,7 @@ public class EffectParser
      */
     protected static char[] dot = {'.'};
 
-    /* This function has a lot of "Magic Constants." To understand them
+    /* This function has many "Magic Constants." To understand them
      * you really should know the model as defined in the documentation.
      */
     public static Effect Parse(Line header, Line line)

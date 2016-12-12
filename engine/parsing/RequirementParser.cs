@@ -25,7 +25,7 @@ public class RequirementParser
      */
     protected static char[] dot = {'.'};
 
-    /* This function has a lot of "Magic Constants." To understand them
+    /* This function has many "Magic Constants." To understand them
      * you really should know the model as defined in the documentation.
      */
     public static Requirement Parse(Line header, Line line)
@@ -146,6 +146,7 @@ public class RequirementParser
             }
             else if(type == Type.Contains)
             {
+                //require contains obj1 obj2.blah.contains.type
                 if(argIdx2 != -1 && arg1[arg1.Length - 1] == "type" &&
                     arg1.Length > 1 && arg1[arg1.Length - 2] == "contains")
                 {
@@ -156,6 +157,7 @@ public class RequirementParser
                                             o2._contains);
                     };
                 }
+                //require contains obj1 obj2.blah.type
                 else if(argIdx2 != -1 && arg1[arg1.Length - 1] == "type")
                 {
                     evaluator = (o, p) => {
@@ -164,6 +166,7 @@ public class RequirementParser
                         return o1.Contains(o2.type);
                     };
                 }
+                //require contains obj1 obj2.blah.type
                 else if(argIdx2 != -1 && arg1[arg1.Length - 1] == "contains")
                 {
                     evaluator = (o, p) => {
@@ -173,6 +176,7 @@ public class RequirementParser
                                             o2._contains);
                     };
                 }
+                //require contains obj1 obj2
                 else if(argIdx2 != -1)
                 {
                     evaluator = (o, p) => {
@@ -181,6 +185,7 @@ public class RequirementParser
                         return o1.Contains(o2);
                     };
                 }
+                //require contains obj1 type
                 else
                 {
                     evaluator = (o, p) => {
@@ -191,6 +196,7 @@ public class RequirementParser
             }
             else if(type == Type.RContains)
             {
+                //require rcontains obj1 obj2.blah.contains.type
                 if(argIdx2 != -1 && arg1[arg1.Length - 1] == "type" &&
                     arg1.Length > 1 && arg1[arg1.Length - 2] == "contains")
                 {
@@ -201,6 +207,7 @@ public class RequirementParser
                                             o2._contains);
                     };
                 }
+                //require rcontains obj1 obj2.blah.type
                 else if(argIdx2 != -1 && arg1[arg1.Length - 1] == "type")
                 {
                     evaluator = (o, p) => {
@@ -209,6 +216,7 @@ public class RequirementParser
                         return o1.RContains(o2.type);
                     };
                 }
+                //require rcontains obj1 obj2.blah.type
                 else if(argIdx2 != -1 && arg1[arg1.Length - 1] == "contains")
                 {
                     evaluator = (o, p) => {
@@ -218,6 +226,7 @@ public class RequirementParser
                                             o2._contains);
                     };
                 }
+                //require rcontains obj1 obj2
                 else if(argIdx2 != -1)
                 {
                     evaluator = (o, p) => {
@@ -226,6 +235,7 @@ public class RequirementParser
                         return o1.RContains(o2);
                     };
                 }
+                //require rcontains obj1 type
                 else
                 {
                     evaluator = (o, p) => {
@@ -251,6 +261,10 @@ public class RequirementParser
                 return Type.Contains;
             case "rcontains":
                 return Type.RContains;
+            case "owns":
+                return Type.Owns;
+            case "timer"
+                return Type.Timer;
             default:
                 throw new Exception("Invalid requirement type " + t);
         }
