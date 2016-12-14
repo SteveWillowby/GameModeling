@@ -6,6 +6,14 @@ using System;
  * This class could really stand to have more
  * checks for malformed input and throw errors when such 
  * input occurs.
+ *
+ * IMPORTANT!! You will note that the lambda expressions use variables
+ * external to the lambda. This is treated as any other reference to
+ * that variable. Thus if the value of the variable is changed after the
+ * lambda expression is created, then when the lambda is called the new
+ * value will be used. Since the lambda maintains a reference to the value,
+ * the value will not be garbage-collected even if all other references are
+ * removed.
  */
 
 public class RequirementParser
