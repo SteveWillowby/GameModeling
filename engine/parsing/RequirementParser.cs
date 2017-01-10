@@ -271,7 +271,7 @@ public class RequirementParser
                 return Type.RContains;
             case "owns":
                 return Type.Owns;
-            case "timer"
+            case "timer":
                 return Type.Timer;
             default:
                 throw new Exception("Invalid requirement type " + t);

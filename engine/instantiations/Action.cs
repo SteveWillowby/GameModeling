@@ -6,9 +6,10 @@ using System;
 
 public class Action
 {
-    protected int numObjects;
-    protected Requirement[] requirements;
-    protected Effect[] effects;
+    public int numObjects;
+    public Requirement[] requirements;
+    public Effect[] effects;
+    public string name;
 
     protected bool RequirementsMet(Object[] o, Player p)
     {
@@ -22,5 +23,11 @@ public class Action
         return true;
     }
 
-    public Action() { numObjects = 0; }
+    public Action()
+    {
+        numObjects = 0;
+        requirements = new Requirement[0];
+        effects = new Effect[0];
+        name = "Null Action";
+    }
 }

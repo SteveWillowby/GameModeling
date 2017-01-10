@@ -8,11 +8,36 @@ public class ActionParser
     {
         Action a = new Action();
 
-        /* Parse each line of the chunk:
-         *
-         * if requirement, add the requirement to a
-         * if effect, add the effect to a
-         */
+        /* Set initial values for a's properties */
+        a.name = c.header.tokens[1];
+        a.numObjects = (c.header.tokens.Length - 2) / 2;
+        int numRequirements = 0;
+        for(int i = 0; i < c.lines.Length; i++)
+        {
+            if(c.lines[i].tokens[0] == "requirement")
+            {
+                numRequirements++;
+            }
+        }
+        a.requirements = new Requirement[numRequirements];
+        a.effects = new Effect[c.lines.Length - numRequirements];
+
+        /* Parse each line of the chunk */
+        int r = 0;
+        int e = 0;
+        for(int i = 0; i < c.lines.Length; i++)
+        {
+            if(c.lines[i].tokens[0] == "requirement")
+            {
+                a.requirements[r] = RequirementParser.Parse(c.header, c.lines[i]);
+                r++;
+            }
+            else
+            {
+                a.effects[e] = EffectParser.Parse(c.header, c.lines[i]);
+                e++;
+            }
+        }
 
         return a;
     }
